@@ -8,34 +8,35 @@ type User struct {
 	Hash string
 }
 
-type UserId struct {
-	UserId uint
-	User   User
+type KeeperInfo struct {
+	UserId      uint
+	User        User
+	Description string
 }
 
 type Credentials struct {
 	gorm.Model
-	UserId
+	KeeperInfo
 	Login    string
 	Password string
 }
 
 type CreditCard struct {
 	gorm.Model
-	UserId
+	KeeperInfo
 	Number string
 	Name   string
 	CVE    string
 }
 
 type Binary struct {
-	UserId
+	KeeperInfo
 	gorm.Model
 	FileId string
 }
 
 type Text struct {
-	UserId
+	KeeperInfo
 	gorm.Model
 	FileId string
 }

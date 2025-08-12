@@ -1,9 +1,12 @@
 package manager
 
-import "context"
+import (
+	"context"
+	"gophkeeper/internal/storage/model"
+)
 
 type UserStorager interface {
-	CreateUser(ctx context.Context, login string, password string) (models.User, error)
+	CreateUser(ctx context.Context, login string, password string) (model.User, error)
 }
 
 type UserManager struct {
@@ -15,9 +18,9 @@ func CreateUserManager(s storage.Storager) UserManager {
 	return UserManager{storage: s}
 }
 
-func (u *UserManager) CreateUser(ctx context.Context, login string, password string) (models.User, error) {
+func (u *UserManager) CreateUser(ctx context.Context, login string, password string) (model.User, error) {
 	if login == "" || password == "" {
-		return models.User{}, internalerror.ErrEmptyLoginOrPassword
+		return model.User{}, internalerror.ErrEmptyLoginOrPassword
 	}
 	hash := u.identity.HashPassword(password)
 	return u.storage.CreateUser(ctx, login, hash)
