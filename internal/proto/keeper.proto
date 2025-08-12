@@ -22,14 +22,19 @@ message LoginResponse{
     string token = 1;
 }
 
-message AddCredentials{
+message AddCredentialsRequest{
     string login = 1;
     string password = 2;
     string description = 3;
+}
+
+message AddCredentialsResponse{
+
 }
 
 
 service KeeperServer {
   rpc registration(NewUserRequest) returns (NewUserResponse);
   rpc login(LoginRequest) returns (LoginResponse);
-}
+  rpc addCredentials (AddCredentialsRequest) returns (AddCredentialsResponse);
+} 

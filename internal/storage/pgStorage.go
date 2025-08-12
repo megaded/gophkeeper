@@ -2,8 +2,10 @@ package storage
 
 import (
 	"context"
+	"errors"
+	"gophkeeper/internal/config"
+	"gophkeeper/internal/internal_error"
 	"gophkeeper/internal/logger"
-	"gophkeeper/internal/server/config"
 	"gophkeeper/internal/server/dto"
 	"gophkeeper/internal/storage/model"
 
@@ -16,9 +18,31 @@ type PgStorage struct {
 }
 
 func (s PgStorage) AddUser(ctx context.Context, login string, password string) error {
-	return nil
+	db := s.db.WithContext(ctx)
+	db.Begin()
+	defer db.Commit()
+	var user model.User
+	result := db.Where("name = ?", login).First(&user)
+	switch {
+	case result.Error == nil:
+		return internal_error.ErrUserAlreadyExists
+	case errors.Is(result.Error, gorm.ErrRecordNotFound):
+		newUser := model.User{
+			Name: login, Hash: password,
+		}
+		r := db.Create(&newUser)
+		if r.Error != nil {
+			db.Rollback()
+			return r.Error
+		}
+
+		user = newUser
+		return r.Error
+	default:
+		return result.Error
+	}
 }
-func (s PgStorage) AddCredentials(ctx context.Context, login string, password string) error {
+func (s PgStorage) AddCredentials(ctx context.Context, dto dto.Credentials) error {
 	return nil
 }
 func (s PgStorage) GetCredentials(ctx context.Context, login string) error {

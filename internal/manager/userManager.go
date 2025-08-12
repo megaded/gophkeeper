@@ -2,11 +2,13 @@ package manager
 
 import (
 	"context"
-	"gophkeeper/internal/storage/model"
+	"gophkeeper/internal/identity"
+	"gophkeeper/internal/internal_error"
+	"gophkeeper/internal/server"
 )
 
 type UserStorager interface {
-	CreateUser(ctx context.Context, login string, password string) (model.User, error)
+	AddUser(ctx context.Context, login string, password string) error
 }
 
 type UserManager struct {
@@ -14,14 +16,14 @@ type UserManager struct {
 	identity identity.IdentityProvider
 }
 
-func CreateUserManager(s storage.Storager) UserManager {
+func CreateUserManager(s server.Storager) UserManager {
 	return UserManager{storage: s}
 }
 
-func (u *UserManager) CreateUser(ctx context.Context, login string, password string) (model.User, error) {
+func (u *UserManager) CreateUser(ctx context.Context, login string, password string) error {
 	if login == "" || password == "" {
-		return model.User{}, internalerror.ErrEmptyLoginOrPassword
+		return internal_error.ErrEmptyLoginOrPassword
 	}
 	hash := u.identity.HashPassword(password)
-	return u.storage.CreateUser(ctx, login, hash)
+	return u.storage.AddUser(ctx, login, hash)
 }
