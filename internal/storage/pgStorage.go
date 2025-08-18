@@ -42,6 +42,18 @@ func (s PgStorage) AddUser(ctx context.Context, login string, password string) e
 		return result.Error
 	}
 }
+
+func (s *PgStorage) GetUser(ctx context.Context, login string) (model.User, error) {
+	var user model.User
+	result := s.db.WithContext(ctx).Where("name = ?", login).First(&user)
+	switch {
+	case errors.Is(result.Error, gorm.ErrRecordNotFound):
+		return user, internal_error.ErrUserNotFound
+	default:
+		return user, result.Error
+	}
+}
+
 func (s PgStorage) AddCredentials(ctx context.Context, dto dto.Credentials) error {
 	return nil
 }
