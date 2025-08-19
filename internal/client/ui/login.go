@@ -4,6 +4,7 @@ package ui
 // from the Bubbles component library.
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -21,6 +22,7 @@ var (
 	helpStyle           = blurredStyle
 	cursorModeHelpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
 
+	errorStyle         = lipgloss.NewStyle().Foreground(lipgloss.Color("204")).Background(lipgloss.Color("235"))
 	loginFocusedButton = focusedStyle.Render("[ Войти ]")
 	loginBlurredButton = fmt.Sprintf("[ %s ]", blurredStyle.Render("Войти"))
 	loginInput         = 0
@@ -34,10 +36,12 @@ type loginModel struct {
 	password   string
 	token      string
 	client     KeeperClient
+	err        error
 }
 
-func InitialLoginModel(client keeperClient) loginModel {
+func InitialLoginModel(client KeeperClient) loginModel {
 	m := loginModel{
+		client: client,
 		inputs: make([]textinput.Model, 2),
 	}
 
@@ -77,18 +81,20 @@ func (m loginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 
-		// Change cursor mode
 		case tea.KeyCtrlR:
 
-			return InitialRegisterModel(), nil
+			return InitialRegisterModel(m.client), nil
 
-		// Set focus to next input
 		case tea.KeyEnter:
 			s := msg.String()
-
-			//здесь добавляем переход на экран с данными
 			if s == "enter" && m.focusIndex == len(m.inputs) {
-				return m, tea.Quit
+				r, err := m.client.Login(context.Background(), m.login, m.password)
+				if err != nil {
+					m.err = err
+					return m, nil
+				}
+				m.token = r
+				return m, nil
 			}
 			currentInput := m.inputs[m.focusIndex]
 			if loginInput == m.focusIndex {
@@ -155,8 +161,12 @@ func (m loginModel) View() string {
 
 	b.WriteString(helpStyle.Render(" (ctrl+r для регистрации)"))
 	b.WriteString("\n")
-	b.WriteString(fmt.Sprintf("Логин %s \n", m.login))
-	b.WriteString(fmt.Sprintf("Пароль %s \n", m.password))
-
+	if m.err != nil {
+		b.WriteString(errorStyle.Render(fmt.Sprintf("Ошибка %s", m.err.Error())))
+	}
+	if m.token != "" {
+		b.WriteString("\n")
+		b.WriteString(m.token)
+	}
 	return b.String()
 }

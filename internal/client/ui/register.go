@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -19,11 +20,14 @@ type registerModel struct {
 	inputs     []textinput.Model
 	login      string
 	password   string
-	client     keeperClient
+	client     KeeperClient
+	err        *error
+	success    bool
 }
 
-func InitialRegisterModel(client keeperClient) registerModel {
+func InitialRegisterModel(client KeeperClient) registerModel {
 	m := registerModel{
+		client: client,
 		inputs: make([]textinput.Model, 2),
 	}
 
@@ -59,26 +63,26 @@ func (m registerModel) Init() tea.Cmd {
 func (m registerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "esc":
+		switch msg.Type {
+		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 
-		// Change cursor mode
-		case "ctrl+r":
+		case tea.KeyCtrlR:
+			return InitialLoginModel(m.client), nil
 
-			return m, nil
-
-		// Set focus to next input
-		case "enter":
-			s := msg.String()
-
-			//здесь добавляем переход на экран с данными
-			if s == "enter" && m.focusIndex == len(m.inputs) {
-				return m, tea.Quit
+		case tea.KeyEnter:
+			if m.focusIndex == 2 {
+				err := m.client.Register(context.TODO(), m.login, m.password)
+				if err != nil {
+					m.err = &err
+				}
+				m.success = true
+				return m, nil
 			}
 			currentInput := m.inputs[m.focusIndex]
 			if loginInput == m.focusIndex {
-				m.login = currentInput.Value()
+				login := currentInput.Value()
+				m.login = login
 			}
 
 			if passwordInput == m.focusIndex {
@@ -139,10 +143,17 @@ func (m registerModel) View() string {
 	}
 	fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
-	b.WriteString(helpStyle.Render(" (ctrl+r для регистрации)"))
 	b.WriteString("\n")
+	if m.success {
+		b.WriteString(helpStyle.Render("Регистрация прошла успешно"))
+	}
+	b.WriteString(helpStyle.Render(" (ctrl+r для входа)"))
 	b.WriteString(fmt.Sprintf("Логин %s \n", m.login))
 	b.WriteString(fmt.Sprintf("Пароль %s \n", m.password))
+	if m.err != nil {
+		b.WriteString("Ошибка регистрации \n")
+		b.WriteString((*m.err).Error())
+	}
 
 	return b.String()
 }

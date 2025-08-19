@@ -4,7 +4,6 @@ import (
 	"context"
 	"gophkeeper/internal/identity"
 	"gophkeeper/internal/internal_error"
-	"gophkeeper/internal/server"
 )
 
 type UserStorager interface {
@@ -16,8 +15,8 @@ type UserManager struct {
 	identity identity.IdentityProvider
 }
 
-func CreateUserManager(s server.Storager) UserManager {
-	return UserManager{storage: s}
+func CreateUserManager(s UserStorager) *UserManager {
+	return &UserManager{storage: s}
 }
 
 func (u *UserManager) CreateUser(ctx context.Context, login string, password string) error {

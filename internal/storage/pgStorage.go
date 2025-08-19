@@ -67,7 +67,7 @@ func (s PgStorage) UpdateCredentials(ctx context.Context, cred dto.Credentials) 
 	return nil
 }
 
-func NewStorage(c *config.Config) PgStorage {
+func NewPgStorage(c *config.Config) PgStorage {
 	db, err := gorm.Open(postgres.Open(c.DBConnString), &gorm.Config{})
 	if err != nil {
 		logger.Log.Fatal(err.Error())
