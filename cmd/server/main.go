@@ -8,24 +8,22 @@ import (
 	"gophkeeper/internal/manager"
 	"gophkeeper/internal/server"
 	"gophkeeper/internal/storage"
+	"gophkeeper/internal/storage/fileStorage/minio"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func main() {
-	/* var filePath = "I:/Torrents/God Is a Bullet (2023)WEB-DLRip-AVC.mkv"
-	os.ReadFile()
-	file, err := os.Open(filePath)
-	if err != nil {
-		panic(err)
-	}
-	file.Read() */
 	logger.SetupLogger("Info")
 	cfg := config.GetConfig()
 	storage := storage.NewPgStorage(&cfg)
 	userManager := manager.CreateUserManager(storage)
-	server := server.NewServer(cfg, &storage, userManager, identity.CreateIdentityProvider(&cfg))
+	fileStorage, err := minio.NewStorage(cfg)
+	if err != nil {
+		panic(err)
+	}
+	server := server.NewServer(cfg, &storage, userManager, identity.CreateIdentityProvider(&cfg), fileStorage)
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		sigChan := make(chan os.Signal, 1)

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"gophkeeper/internal/logger"
 
 	"github.com/caarlos0/env/v11"
@@ -23,6 +24,6 @@ func GetConfig() Config {
 	}
 	cfg := Config{}
 	env.Parse(&cfg)
-	logger.Log.Info(cfg.Address)
+	logger.Log.Info(fmt.Sprint(cfg))
 	return cfg
 }

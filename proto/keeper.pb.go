@@ -301,6 +301,278 @@ func (*AddCredentialsResponse) Descriptor() ([]byte, []int) {
 	return file_keeper_proto_rawDescGZIP(), []int{5}
 }
 
+type UploadBinaryFileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Size          int64                  `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadBinaryFileRequest) Reset() {
+	*x = UploadBinaryFileRequest{}
+	mi := &file_keeper_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadBinaryFileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadBinaryFileRequest) ProtoMessage() {}
+
+func (x *UploadBinaryFileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadBinaryFileRequest.ProtoReflect.Descriptor instead.
+func (*UploadBinaryFileRequest) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UploadBinaryFileRequest) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *UploadBinaryFileRequest) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+func (x *UploadBinaryFileRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UploadBinaryFileRequest) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+type UploadBinaryFileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadBinaryFileResponse) Reset() {
+	*x = UploadBinaryFileResponse{}
+	mi := &file_keeper_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadBinaryFileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadBinaryFileResponse) ProtoMessage() {}
+
+func (x *UploadBinaryFileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadBinaryFileResponse.ProtoReflect.Descriptor instead.
+func (*UploadBinaryFileResponse) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{7}
+}
+
+type DownloadBinaryFileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DownloadBinaryFileRequest) Reset() {
+	*x = DownloadBinaryFileRequest{}
+	mi := &file_keeper_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DownloadBinaryFileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DownloadBinaryFileRequest) ProtoMessage() {}
+
+func (x *DownloadBinaryFileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DownloadBinaryFileRequest.ProtoReflect.Descriptor instead.
+func (*DownloadBinaryFileRequest) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DownloadBinaryFileRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type DownloadBinaryFileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DownloadBinaryFileResponse) Reset() {
+	*x = DownloadBinaryFileResponse{}
+	mi := &file_keeper_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DownloadBinaryFileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DownloadBinaryFileResponse) ProtoMessage() {}
+
+func (x *DownloadBinaryFileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DownloadBinaryFileResponse.ProtoReflect.Descriptor instead.
+func (*DownloadBinaryFileResponse) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *DownloadBinaryFileResponse) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *DownloadBinaryFileResponse) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+type UserDataRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserDataRequest) Reset() {
+	*x = UserDataRequest{}
+	mi := &file_keeper_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserDataRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserDataRequest) ProtoMessage() {}
+
+func (x *UserDataRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserDataRequest.ProtoReflect.Descriptor instead.
+func (*UserDataRequest) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{10}
+}
+
+type UserDataResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserDataResponse) Reset() {
+	*x = UserDataResponse{}
+	mi := &file_keeper_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserDataResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserDataResponse) ProtoMessage() {}
+
+func (x *UserDataResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserDataResponse.ProtoReflect.Descriptor instead.
+func (*UserDataResponse) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{11}
+}
+
 var File_keeper_proto protoreflect.FileDescriptor
 
 const file_keeper_proto_rawDesc = "" +
@@ -319,11 +591,26 @@ const file_keeper_proto_rawDesc = "" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\"\x18\n" +
-	"\x16AddCredentialsResponse2\xfa\x01\n" +
-	"\fKeeperServer\x12K\n" +
+	"\x16AddCredentialsResponse\"\x85\x01\n" +
+	"\x17UploadBinaryFileRequest\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\fR\acontent\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x12\n" +
+	"\x04size\x18\x04 \x01(\x03R\x04size\"\x1a\n" +
+	"\x18UploadBinaryFileResponse\"+\n" +
+	"\x19DownloadBinaryFileRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"R\n" +
+	"\x1aDownloadBinaryFileResponse\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\fR\acontent\"\x11\n" +
+	"\x0fUserDataRequest\"\x12\n" +
+	"\x10UserDataResponse2\xc0\x03\n" +
+	"\x06Keeper\x12K\n" +
 	"\fregistration\x12\x1c.keeper_proto.NewUserRequest\x1a\x1d.keeper_proto.NewUserResponse\x12@\n" +
 	"\x05login\x12\x1a.keeper_proto.LoginRequest\x1a\x1b.keeper_proto.LoginResponse\x12[\n" +
-	"\x0eaddCredentials\x12#.keeper_proto.AddCredentialsRequest\x1a$.keeper_proto.AddCredentialsResponseB\x0eZ\fproto/keeperb\x06proto3"
+	"\x0eaddCredentials\x12#.keeper_proto.AddCredentialsRequest\x1a$.keeper_proto.AddCredentialsResponse\x12c\n" +
+	"\x10uploadBinaryFile\x12%.keeper_proto.UploadBinaryFileRequest\x1a&.keeper_proto.UploadBinaryFileResponse(\x01\x12e\n" +
+	"\x12downloadBinaryFile\x12'.keeper_proto.DownloadBinaryFileRequest\x1a&.keeper_proto.UploadBinaryFileResponseB\x0eZ\fproto/keeperb\x06proto3"
 
 var (
 	file_keeper_proto_rawDescOnce sync.Once
@@ -337,24 +624,34 @@ func file_keeper_proto_rawDescGZIP() []byte {
 	return file_keeper_proto_rawDescData
 }
 
-var file_keeper_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_keeper_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_keeper_proto_goTypes = []any{
-	(*NewUserRequest)(nil),         // 0: keeper_proto.NewUserRequest
-	(*NewUserResponse)(nil),        // 1: keeper_proto.NewUserResponse
-	(*LoginRequest)(nil),           // 2: keeper_proto.LoginRequest
-	(*LoginResponse)(nil),          // 3: keeper_proto.LoginResponse
-	(*AddCredentialsRequest)(nil),  // 4: keeper_proto.AddCredentialsRequest
-	(*AddCredentialsResponse)(nil), // 5: keeper_proto.AddCredentialsResponse
+	(*NewUserRequest)(nil),             // 0: keeper_proto.NewUserRequest
+	(*NewUserResponse)(nil),            // 1: keeper_proto.NewUserResponse
+	(*LoginRequest)(nil),               // 2: keeper_proto.LoginRequest
+	(*LoginResponse)(nil),              // 3: keeper_proto.LoginResponse
+	(*AddCredentialsRequest)(nil),      // 4: keeper_proto.AddCredentialsRequest
+	(*AddCredentialsResponse)(nil),     // 5: keeper_proto.AddCredentialsResponse
+	(*UploadBinaryFileRequest)(nil),    // 6: keeper_proto.UploadBinaryFileRequest
+	(*UploadBinaryFileResponse)(nil),   // 7: keeper_proto.UploadBinaryFileResponse
+	(*DownloadBinaryFileRequest)(nil),  // 8: keeper_proto.DownloadBinaryFileRequest
+	(*DownloadBinaryFileResponse)(nil), // 9: keeper_proto.DownloadBinaryFileResponse
+	(*UserDataRequest)(nil),            // 10: keeper_proto.UserDataRequest
+	(*UserDataResponse)(nil),           // 11: keeper_proto.UserDataResponse
 }
 var file_keeper_proto_depIdxs = []int32{
-	0, // 0: keeper_proto.KeeperServer.registration:input_type -> keeper_proto.NewUserRequest
-	2, // 1: keeper_proto.KeeperServer.login:input_type -> keeper_proto.LoginRequest
-	4, // 2: keeper_proto.KeeperServer.addCredentials:input_type -> keeper_proto.AddCredentialsRequest
-	1, // 3: keeper_proto.KeeperServer.registration:output_type -> keeper_proto.NewUserResponse
-	3, // 4: keeper_proto.KeeperServer.login:output_type -> keeper_proto.LoginResponse
-	5, // 5: keeper_proto.KeeperServer.addCredentials:output_type -> keeper_proto.AddCredentialsResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	0, // 0: keeper_proto.Keeper.registration:input_type -> keeper_proto.NewUserRequest
+	2, // 1: keeper_proto.Keeper.login:input_type -> keeper_proto.LoginRequest
+	4, // 2: keeper_proto.Keeper.addCredentials:input_type -> keeper_proto.AddCredentialsRequest
+	6, // 3: keeper_proto.Keeper.uploadBinaryFile:input_type -> keeper_proto.UploadBinaryFileRequest
+	8, // 4: keeper_proto.Keeper.downloadBinaryFile:input_type -> keeper_proto.DownloadBinaryFileRequest
+	1, // 5: keeper_proto.Keeper.registration:output_type -> keeper_proto.NewUserResponse
+	3, // 6: keeper_proto.Keeper.login:output_type -> keeper_proto.LoginResponse
+	5, // 7: keeper_proto.Keeper.addCredentials:output_type -> keeper_proto.AddCredentialsResponse
+	7, // 8: keeper_proto.Keeper.uploadBinaryFile:output_type -> keeper_proto.UploadBinaryFileResponse
+	7, // 9: keeper_proto.Keeper.downloadBinaryFile:output_type -> keeper_proto.UploadBinaryFileResponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -371,7 +668,7 @@ func file_keeper_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_keeper_proto_rawDesc), len(file_keeper_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

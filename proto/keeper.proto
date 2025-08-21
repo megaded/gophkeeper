@@ -32,9 +32,41 @@ message AddCredentialsResponse{
 
 }
 
+message UploadBinaryFileRequest{
+    string filename = 1;
+    bytes content = 2;
+    string description = 3;
+    int64 size = 4;
+}
+
+message UploadBinaryFileResponse{
+
+}
+
+message DownloadBinaryFileRequest{
+    int64 id = 1;
+}
+
+message DownloadBinaryFileResponse{
+    string filename = 1;
+    bytes content = 2;
+}
+
+
+message UserDataRequest{
+
+}
+
+message UserDataResponse{
+
+}
 
 service Keeper {
   rpc registration(NewUserRequest) returns (NewUserResponse);
   rpc login(LoginRequest) returns (LoginResponse);
   rpc addCredentials (AddCredentialsRequest) returns (AddCredentialsResponse);
+  rpc uploadBinaryFile (stream UploadBinaryFileRequest) returns (UploadBinaryFileResponse);
+  rpc downloadBinaryFile (DownloadBinaryFileRequest) returns (UploadBinaryFileResponse);
 } 
+
+
