@@ -1,0 +1,20 @@
+services:
+  minio:
+    image: docker.io/bitnami/minio:2025
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - 'minio_data:/bitnami/minio/data'
+    environment:
+      - MINIO_BROWSER=true
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
+      - MINIO_SERVER_ACCESS_KEY=minio
+      - MINIO_SERVER_SECRET_KEY=minio
+      - MINIO_ADDRESS:':9000'
+      - MINIO_CONSOLE_ADDRESS:':9001'
+
+volumes:
+  minio_data:
+    driver: local

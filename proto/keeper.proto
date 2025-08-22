@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package keeper_proto;
+
+option go_package = "proto/keeper";
+
+message NewUserRequest{
+    string login = 1;
+    string password = 2;
+}
+
+message NewUserResponse{
+
+}
+
+message LoginRequest{
+    string login = 1;
+    string password = 2;
+}
+
+message LoginResponse{
+    string token = 1;
+}
+
+message AddCredentialsRequest{
+    string login = 1;
+    string password = 2;
+    string description = 3;
+}
+
+message AddCredentialsResponse{
+
+}
+
+message UploadBinaryFileRequest{
+    string filename = 1;
+    bytes content = 2;
+    string description = 3;
+    int64 size = 4;
+}
+
+message UploadBinaryFileResponse{
+
+}
+
+message DownloadBinaryFileRequest{
+    int64 id = 1;
+}
+
+message DownloadBinaryFileResponse{
+    string filename = 1;
+    bytes content = 2;
+}
+
+
+message UserDataRequest{
+
+}
+
+message UserDataResponse{
+
+}
+
+message AddCreditCardRequest{
+    string number = 1;
+    string exp = 2;
+    string cvv = 3;
+    string description = 4;
+}
+
+message AddCreditCardResponse{
+    
+}
+
+message CreditCard{
+    string number = 1;
+    string exp = 2;
+    string cvv = 3;
+    string description = 4;
+}
+
+message CreditCardRequest{
+
+}
+
+message CreditCardListResponse{
+    repeated CreditCard creditCards = 1; 
+}
+
+message DeleteCreditCardRequest{
+    uint32 id = 1;
+}
+
+message DeleteCreditCardResponse{
+
+}
+
+service Keeper {
+  rpc registration(NewUserRequest) returns (NewUserResponse);
+  rpc login(LoginRequest) returns (LoginResponse);
+  rpc addCredentials (AddCredentialsRequest) returns (AddCredentialsResponse);
+  rpc uploadBinaryFile (stream UploadBinaryFileRequest) returns (UploadBinaryFileResponse);
+  rpc downloadBinaryFile (DownloadBinaryFileRequest) returns (UploadBinaryFileResponse);
+  rpc addCreditCard (AddCreditCardRequest) returns (AddCreditCardResponse);
+  rpc getCreditCardList(CreditCardRequest) returns (CreditCardListResponse);
+  rpc deleteCreditCard(DeleteCreditCardRequest) returns (DeleteCreditCardResponse);
+} 
+
+
