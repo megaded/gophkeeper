@@ -62,7 +62,5 @@ func (id *IdentityProvider) HashPassword(password string) string {
 
 func (id *IdentityProvider) VerifyPassword(hash string, password string) bool {
 	hashedPassword := id.HashPassword(password)
-	logger.Log.Info(hash)
-	logger.Log.Info(hashedPassword)
 	return hmac.Equal([]byte(hash), []byte(hashedPassword))
 }

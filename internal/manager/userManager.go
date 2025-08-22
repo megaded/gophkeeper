@@ -15,8 +15,8 @@ type UserManager struct {
 	identity identity.IdentityProvider
 }
 
-func CreateUserManager(s UserStorager) *UserManager {
-	return &UserManager{storage: s}
+func CreateUserManager(s UserStorager, identityProvider identity.IdentityProvider) *UserManager {
+	return &UserManager{storage: s, identity: identityProvider}
 }
 
 func (u *UserManager) CreateUser(ctx context.Context, login string, password string) error {

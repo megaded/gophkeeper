@@ -3,6 +3,8 @@ package ui
 import (
 	"context"
 	"gophkeeper/internal/client/proto"
+	"gophkeeper/internal/server/dto"
+	"io"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -20,6 +22,10 @@ type mainModel struct {
 type KeeperClient interface {
 	Login(ctx context.Context, login string, password string) (token string, err error)
 	Register(ctx context.Context, login string, password string) error
+	AddCreditCard(ctx context.Context, dto dto.Card) error
+	AddCredentials(ctx context.Context, cred dto.Credentials) error
+	UploadBinaryFile(reader io.Reader, fileName string, description string, size int64) error
+	GetCreditCards(ctx context.Context) ([]dto.Card, error)
 }
 
 func InitialMainModel() mainModel {

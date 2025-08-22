@@ -6,6 +6,7 @@ import (
 	"errors"
 	"gophkeeper/internal/config"
 	"gophkeeper/internal/logger"
+	"gophkeeper/internal/server/dto"
 	pb "gophkeeper/proto"
 	"io"
 
@@ -20,12 +21,13 @@ type keeperClient struct {
 	token  string
 }
 
-func (c keeperClient) Login(ctx context.Context, login string, password string) (token string, err error) {
+func (c *keeperClient) Login(ctx context.Context, login string, password string) (token string, err error) {
 	r, err := c.client.Login(ctx, &pb.LoginRequest{Login: login, Password: password})
 	if err != nil {
 		return "", err
 	}
-	return r.GetToken(), err
+	c.token = r.GetToken()
+	return c.token, err
 }
 
 func NewKeeperClient() *keeperClient {
@@ -38,7 +40,42 @@ func NewKeeperClient() *keeperClient {
 	return &keeperClient{client: pb.NewKeeperClient(conn)}
 }
 
-func (c keeperClient) Register(ctx context.Context, login string, password string) error {
+func (c *keeperClient) AddCredentials(ctx context.Context, cred dto.Credentials) error {
+	req := &pb.AddCredentialsRequest{Login: cred.Login, Password: cred.Password, Description: cred.Description}
+	_, err := c.client.AddCredentials(ctx, req)
+	return err
+}
+
+func (c *keeperClient) AddCreditCard(ctx context.Context, dto dto.Card) error {
+	ctx, err := getCtx(c.token)
+	if err != nil {
+		logger.Log.Error(err.Error())
+		return err
+	}
+	req := &pb.AddCreditCardRequest{Number: dto.Number, Exp: dto.Exp, Cvv: dto.CVV, Description: dto.Description}
+	_, err = c.client.AddCreditCard(ctx, req)
+	return err
+}
+
+func (c *keeperClient) GetCreditCards(ctx context.Context) ([]dto.Card, error) {
+	ctx, err := getCtx(c.token)
+	if err != nil {
+		logger.Log.Error(err.Error())
+		return nil, err
+	}
+	req := pb.CreditCardRequest{}
+	resp, err := c.client.GetCreditCardList(ctx, &req)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]dto.Card, 0, len(resp.CreditCards))
+	for _, k := range resp.CreditCards {
+		result = append(result, dto.Card{Number: k.Number, Exp: k.Exp, CVV: k.Cvv, Description: k.Description})
+	}
+	return result, nil
+}
+
+func (c *keeperClient) Register(ctx context.Context, login string, password string) error {
 	req := &pb.NewUserRequest{Login: login, Password: password}
 	_, err := c.client.Registration(context.Background(), req)
 	if err != nil {
@@ -47,13 +84,13 @@ func (c keeperClient) Register(ctx context.Context, login string, password strin
 	return err
 }
 
-func (c keeperClient) UploadBinaryFile(reader io.Reader, fileName string, description string, size int64) error {
-	/*ctx, err := getCtx(c.token)
+func (c *keeperClient) UploadBinaryFile(reader io.Reader, fileName string, description string, size int64) error {
+	ctx, err := getCtx(c.token)
 	if err != nil {
 		logger.Log.Error(err.Error())
 		return err
-	}*/
-	k, err := c.client.UploadBinaryFile(context.TODO())
+	}
+	k, err := c.client.UploadBinaryFile(ctx)
 	if err != nil {
 		logger.Log.Error(err.Error())
 		return err
@@ -86,7 +123,7 @@ func (c keeperClient) UploadBinaryFile(reader io.Reader, fileName string, descri
 }
 
 func getCtx(token string) (context.Context, error) {
-	if token != "" {
+	if token == "" {
 		return nil, errors.New("Token is empty")
 	}
 	md := metadata.New(map[string]string{"token": token})

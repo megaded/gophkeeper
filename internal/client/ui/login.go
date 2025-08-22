@@ -94,7 +94,7 @@ func (m loginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 				m.token = r
-				return m, nil
+				return NewDataMenu(m.client), nil
 			}
 			currentInput := m.inputs[m.focusIndex]
 			if loginInput == m.focusIndex {

@@ -5,3 +5,11 @@ type Credentials struct {
 	Password    string
 	Description string
 }
+
+type Card struct {
+	Id          uint
+	Number      string
+	Exp         string
+	CVV         string
+	Description string
+}

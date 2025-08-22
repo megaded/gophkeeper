@@ -61,12 +61,49 @@ message UserDataResponse{
 
 }
 
+message AddCreditCardRequest{
+    string number = 1;
+    string exp = 2;
+    string cvv = 3;
+    string description = 4;
+}
+
+message AddCreditCardResponse{
+    
+}
+
+message CreditCard{
+    string number = 1;
+    string exp = 2;
+    string cvv = 3;
+    string description = 4;
+}
+
+message CreditCardRequest{
+
+}
+
+message CreditCardListResponse{
+    repeated CreditCard creditCards = 1; 
+}
+
+message DeleteCreditCardRequest{
+    uint32 id = 1;
+}
+
+message DeleteCreditCardResponse{
+
+}
+
 service Keeper {
   rpc registration(NewUserRequest) returns (NewUserResponse);
   rpc login(LoginRequest) returns (LoginResponse);
   rpc addCredentials (AddCredentialsRequest) returns (AddCredentialsResponse);
   rpc uploadBinaryFile (stream UploadBinaryFileRequest) returns (UploadBinaryFileResponse);
   rpc downloadBinaryFile (DownloadBinaryFileRequest) returns (UploadBinaryFileResponse);
+  rpc addCreditCard (AddCreditCardRequest) returns (AddCreditCardResponse);
+  rpc getCreditCardList(CreditCardRequest) returns (CreditCardListResponse);
+  rpc deleteCreditCard(DeleteCreditCardRequest) returns (DeleteCreditCardResponse);
 } 
 
 

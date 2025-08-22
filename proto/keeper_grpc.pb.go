@@ -24,6 +24,9 @@ const (
 	Keeper_AddCredentials_FullMethodName     = "/keeper_proto.Keeper/addCredentials"
 	Keeper_UploadBinaryFile_FullMethodName   = "/keeper_proto.Keeper/uploadBinaryFile"
 	Keeper_DownloadBinaryFile_FullMethodName = "/keeper_proto.Keeper/downloadBinaryFile"
+	Keeper_AddCreditCard_FullMethodName      = "/keeper_proto.Keeper/addCreditCard"
+	Keeper_GetCreditCardList_FullMethodName  = "/keeper_proto.Keeper/getCreditCardList"
+	Keeper_DeleteCreditCard_FullMethodName   = "/keeper_proto.Keeper/deleteCreditCard"
 )
 
 // KeeperClient is the client API for Keeper service.
@@ -35,6 +38,9 @@ type KeeperClient interface {
 	AddCredentials(ctx context.Context, in *AddCredentialsRequest, opts ...grpc.CallOption) (*AddCredentialsResponse, error)
 	UploadBinaryFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadBinaryFileRequest, UploadBinaryFileResponse], error)
 	DownloadBinaryFile(ctx context.Context, in *DownloadBinaryFileRequest, opts ...grpc.CallOption) (*UploadBinaryFileResponse, error)
+	AddCreditCard(ctx context.Context, in *AddCreditCardRequest, opts ...grpc.CallOption) (*AddCreditCardResponse, error)
+	GetCreditCardList(ctx context.Context, in *CreditCardRequest, opts ...grpc.CallOption) (*CreditCardListResponse, error)
+	DeleteCreditCard(ctx context.Context, in *DeleteCreditCardRequest, opts ...grpc.CallOption) (*DeleteCreditCardResponse, error)
 }
 
 type keeperClient struct {
@@ -98,6 +104,36 @@ func (c *keeperClient) DownloadBinaryFile(ctx context.Context, in *DownloadBinar
 	return out, nil
 }
 
+func (c *keeperClient) AddCreditCard(ctx context.Context, in *AddCreditCardRequest, opts ...grpc.CallOption) (*AddCreditCardResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddCreditCardResponse)
+	err := c.cc.Invoke(ctx, Keeper_AddCreditCard_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) GetCreditCardList(ctx context.Context, in *CreditCardRequest, opts ...grpc.CallOption) (*CreditCardListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreditCardListResponse)
+	err := c.cc.Invoke(ctx, Keeper_GetCreditCardList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) DeleteCreditCard(ctx context.Context, in *DeleteCreditCardRequest, opts ...grpc.CallOption) (*DeleteCreditCardResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteCreditCardResponse)
+	err := c.cc.Invoke(ctx, Keeper_DeleteCreditCard_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KeeperServer is the server API for Keeper service.
 // All implementations must embed UnimplementedKeeperServer
 // for forward compatibility.
@@ -107,6 +143,9 @@ type KeeperServer interface {
 	AddCredentials(context.Context, *AddCredentialsRequest) (*AddCredentialsResponse, error)
 	UploadBinaryFile(grpc.ClientStreamingServer[UploadBinaryFileRequest, UploadBinaryFileResponse]) error
 	DownloadBinaryFile(context.Context, *DownloadBinaryFileRequest) (*UploadBinaryFileResponse, error)
+	AddCreditCard(context.Context, *AddCreditCardRequest) (*AddCreditCardResponse, error)
+	GetCreditCardList(context.Context, *CreditCardRequest) (*CreditCardListResponse, error)
+	DeleteCreditCard(context.Context, *DeleteCreditCardRequest) (*DeleteCreditCardResponse, error)
 	mustEmbedUnimplementedKeeperServer()
 }
 
@@ -131,6 +170,15 @@ func (UnimplementedKeeperServer) UploadBinaryFile(grpc.ClientStreamingServer[Upl
 }
 func (UnimplementedKeeperServer) DownloadBinaryFile(context.Context, *DownloadBinaryFileRequest) (*UploadBinaryFileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DownloadBinaryFile not implemented")
+}
+func (UnimplementedKeeperServer) AddCreditCard(context.Context, *AddCreditCardRequest) (*AddCreditCardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCreditCard not implemented")
+}
+func (UnimplementedKeeperServer) GetCreditCardList(context.Context, *CreditCardRequest) (*CreditCardListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCreditCardList not implemented")
+}
+func (UnimplementedKeeperServer) DeleteCreditCard(context.Context, *DeleteCreditCardRequest) (*DeleteCreditCardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCreditCard not implemented")
 }
 func (UnimplementedKeeperServer) mustEmbedUnimplementedKeeperServer() {}
 func (UnimplementedKeeperServer) testEmbeddedByValue()                {}
@@ -232,6 +280,60 @@ func _Keeper_DownloadBinaryFile_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Keeper_AddCreditCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCreditCardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).AddCreditCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_AddCreditCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).AddCreditCard(ctx, req.(*AddCreditCardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_GetCreditCardList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreditCardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).GetCreditCardList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_GetCreditCardList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).GetCreditCardList(ctx, req.(*CreditCardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_DeleteCreditCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCreditCardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).DeleteCreditCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_DeleteCreditCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).DeleteCreditCard(ctx, req.(*DeleteCreditCardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Keeper_ServiceDesc is the grpc.ServiceDesc for Keeper service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -254,6 +356,18 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "downloadBinaryFile",
 			Handler:    _Keeper_DownloadBinaryFile_Handler,
+		},
+		{
+			MethodName: "addCreditCard",
+			Handler:    _Keeper_AddCreditCard_Handler,
+		},
+		{
+			MethodName: "getCreditCardList",
+			Handler:    _Keeper_GetCreditCardList_Handler,
+		},
+		{
+			MethodName: "deleteCreditCard",
+			Handler:    _Keeper_DeleteCreditCard_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

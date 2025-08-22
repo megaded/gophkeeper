@@ -4,6 +4,7 @@ import (
 	"context"
 	"gophkeeper/internal/identity"
 	"slices"
+	"strconv"
 
 	pb "gophkeeper/proto"
 
@@ -30,6 +31,7 @@ func GetAuthInterceptor(provider identity.IdentityProvider) authInterceptor {
 func (a *authInterceptor) UnaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	if !slices.Contains(ignoreMethods, info.FullMethod) {
 		var token string
+		var md metadata.MD
 		if md, ok := metadata.FromIncomingContext(ctx); ok {
 			values := md.Get("token")
 			if len(values) > 0 {
@@ -43,8 +45,10 @@ func (a *authInterceptor) UnaryInterceptor(ctx context.Context, req interface{},
 		if err != nil {
 			return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
 		}
-		md := metadata.New(map[string]string{"user_id": string(userId)})
-		ctx = metadata.NewOutgoingContext(ctx, md)
+
+		md = metadata.New(map[string]string{"user_id": strconv.Itoa(userId)})
+		ctx = metadata.NewIncomingContext(ctx, md)
+		return handler(ctx, req)
 	}
 	return handler(ctx, req)
 }

@@ -8,6 +8,11 @@ type User struct {
 	Hash string
 }
 
+type FileInfo struct {
+	FileName   string
+	BuckerName string
+}
+
 type KeeperInfo struct {
 	UserId      uint
 	User        User
@@ -17,26 +22,26 @@ type KeeperInfo struct {
 type Credentials struct {
 	gorm.Model
 	KeeperInfo
-	Login    string
-	Password string
+	Login    []byte
+	Password []byte
 }
 
 type CreditCard struct {
 	gorm.Model
 	KeeperInfo
-	Number string
-	Name   string
-	CVE    string
+	Number []byte
+	Ext    []byte
+	CVE    []byte
 }
 
 type Binary struct {
 	KeeperInfo
 	gorm.Model
-	FileId string
+	FileInfo
 }
 
 type Text struct {
 	KeeperInfo
 	gorm.Model
-	FileId string
+	FileInfo
 }
