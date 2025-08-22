@@ -17,17 +17,40 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
 
+      - name: Cache modules
+        uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - name: Install dependencies
         run: |
           go mod download
           go mod tidy
+
+      - name: Lint code
+        run: |
+          go get -u golang.org/x/tools/cmd/goimports
+          goimports -w .
+          go get -u honnef.co/go/tools/cmd/staticcheck
+          staticcheck ./...
+
+      - name: Format code
+        run: |
+          go fmt ./...
+          if ! go fmt ./...; then
+            echo "Code formatting failed"
+            exit 1
+          fi
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
@@ -47,10 +70,49 @@ jobs:
           GOOS=windows GOARCH=amd64 go build -o myapp-windows-amd64.exe .
           GOOS=windows GOARCH=386 go build -o myapp-windows-386.exe .
 
+      - name: Run tests
+        run: |
+          go test -v ./...
+
+      - name: Run race detector
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          go test -race ./...
+
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: myapp-${{ matrix.os }}
           path: |
             myapp-*
             !myapp-*.exe
+
+      - name: Publish to GitHub Releases
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            myapp-*
+            !myapp-*.exe
+
+      - name: Publish to Docker Hub (optional)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: username/repo:latest
+
+      - name: Code Coverage
+        run: |
+          go get -u github.com/wadey/gocov
+          go get -u github.com/AlekSi/gocov-xml
+          go test -coverprofile=coverage.out ./...
+          gocov convert coverage.out | gocov-xml > coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-go
