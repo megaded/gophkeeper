@@ -9,8 +9,9 @@ type User struct {
 }
 
 type FileInfo struct {
-	FileName   string
-	BuckerName string
+	OriginalFileName string
+	ExternalFileName string
+	BuckerName       string
 }
 
 type KeeperInfo struct {
@@ -43,5 +44,7 @@ type Binary struct {
 type Text struct {
 	KeeperInfo
 	gorm.Model
-	FileInfo
+	BinaryId uint
+	Binary   Binary
+	IsFile   bool
 }

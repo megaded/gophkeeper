@@ -13,6 +13,7 @@ type PgStorage struct {
 	db *gorm.DB
 }
 
+// Создание новое хранилище PosgreSql
 func NewStorage(c *config.Config) PgStorage {
 	db, err := gorm.Open(postgres.Open(c.DBConnString), &gorm.Config{})
 	if err != nil {

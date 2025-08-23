@@ -3,6 +3,7 @@ package manager
 import (
 	"context"
 	"gophkeeper/internal/config"
+	"gophkeeper/internal/internal_error"
 	"gophkeeper/internal/server/dto"
 	"gophkeeper/internal/storage/model"
 )
@@ -10,6 +11,18 @@ import (
 type CreditCardManager struct {
 	cryptoManager Crypter
 	storager      creditCardStorager
+}
+
+func (c CreditCardManager) DeleteCreditCard(ctx context.Context, userId uint, id uint) error {
+	card, err := c.storager.GetCreditCard(ctx, id)
+	if err != nil {
+		return err
+	}
+	if card.UserId != userId {
+		return internal_error.ErrorAccessDenied
+	}
+	err = c.storager.DeleteCreditCard(ctx, id)
+	return err
 }
 
 func (c CreditCardManager) AddCreditCard(ctx context.Context, userId uint, dto dto.Card) error {
@@ -55,11 +68,8 @@ func (c CreditCardManager) GetCreditCards(ctx context.Context, userId uint) ([]d
 type creditCardStorager interface {
 	AddCreditCard(ctx context.Context, userId uint, number []byte, ext []byte, cvv []byte, description string) error
 	GetCreditCards(ctx context.Context, userId uint) ([]model.CreditCard, error)
-}
-
-type Crypter interface {
-	Encrypt(content string) ([]byte, error)
-	Decrypt(content []byte) (string, error)
+	GetCreditCard(ctx context.Context, id uint) (model.CreditCard, error)
+	DeleteCreditCard(ctx context.Context, id uint) error
 }
 
 func NewCreditCardManager(cfg config.Config, storager creditCardStorager) CreditCardManager {

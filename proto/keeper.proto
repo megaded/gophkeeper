@@ -32,6 +32,29 @@ message AddCredentialsResponse{
 
 }
 
+message Credential{
+    string login = 1;
+    string password = 2;
+    string description = 3;
+}
+
+message CredentialListRequest{
+
+}
+
+message CredentialListResponse{
+    repeated Credential credentials = 1;
+}
+
+message DeleteCredentialRequest{
+    uint32 id = 1;
+}
+
+message DeleteCredentialResponse{
+
+}
+
+
 message UploadBinaryFileRequest{
     string filename = 1;
     bytes content = 2;
@@ -52,14 +75,26 @@ message DownloadBinaryFileResponse{
     bytes content = 2;
 }
 
+message UploadTextFileRequest{
+    string filename = 1;
+    bytes content = 2;
+    string description = 3;
+    int64 size = 4;
+}
 
-message UserDataRequest{
+message UploadTextFileResponse{
 
 }
 
-message UserDataResponse{
+message UploadTextRequest{
+    string content = 1;
+    string description = 2;
+}
+
+message UploadTextResponse{
 
 }
+
 
 message AddCreditCardRequest{
     string number = 1;
@@ -99,7 +134,11 @@ service Keeper {
   rpc registration(NewUserRequest) returns (NewUserResponse);
   rpc login(LoginRequest) returns (LoginResponse);
   rpc addCredentials (AddCredentialsRequest) returns (AddCredentialsResponse);
+  rpc getCredentialsList(CredentialListRequest) returns (CredentialListResponse);
+  rpc deleteCredential(DeleteCredentialRequest) returns (DeleteCredentialResponse);
   rpc uploadBinaryFile (stream UploadBinaryFileRequest) returns (UploadBinaryFileResponse);
+  rpc uploadTextFile (stream UploadTextFileRequest) returns (UploadTextFileRequest);
+  rpc uploadText (UploadTextRequest) returns (UploadTextResponse);
   rpc downloadBinaryFile (DownloadBinaryFileRequest) returns (UploadBinaryFileResponse);
   rpc addCreditCard (AddCreditCardRequest) returns (AddCreditCardResponse);
   rpc getCreditCardList(CreditCardRequest) returns (CreditCardListResponse);

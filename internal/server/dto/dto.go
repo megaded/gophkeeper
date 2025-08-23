@@ -7,9 +7,24 @@ type Credentials struct {
 }
 
 type Card struct {
+	UserId      uint
 	Id          uint
 	Number      string
 	Exp         string
 	CVV         string
 	Description string
+}
+
+type BinaryFile struct {
+	UserId      uint
+	FileName    string
+	Description string
+}
+
+type Text struct {
+	Id          uint
+	UserId      uint
+	Description string
+	Content     string
+	IsFile      bool
 }

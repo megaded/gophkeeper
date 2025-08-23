@@ -16,12 +16,13 @@ import (
 )
 
 type Server struct {
-	storage           Storager
+	storage           storager
 	cfg               config.Config
 	userManager       UserManager
 	identityProvider  identity.IdentityProvider
 	fileStorage       FileStorager
 	creditCardManager manager.CreditCardManager
+	credManager       manager.CredentialsManager
 	pb.UnimplementedKeeperServer
 }
 
@@ -31,10 +32,6 @@ func (s *Server) DownloadBinaryFile(context.Context, *pb.DownloadBinaryFileReque
 
 type FileStorager interface {
 	UploadFile(ctx context.Context, userName string, fileName string, reader io.Reader, size int64) error
-}
-
-func (s *Server) AddCredentials(context.Context, *pb.AddCredentialsRequest) (*pb.AddCredentialsResponse, error) {
-	panic("unimplemented")
 }
 
 func (s *Server) Start(ctx context.Context) {
@@ -57,17 +54,41 @@ func (s *Server) Start(ctx context.Context) {
 
 var _ pb.KeeperServer = (*Server)(nil)
 
-func NewServer(cfg config.Config, storage Storager, userManager UserManager, identityProvider identity.IdentityProvider, fileStorage FileStorager, creditCardManager manager.CreditCardManager) Server {
-	return Server{storage: storage, cfg: cfg, userManager: userManager, identityProvider: identityProvider, fileStorage: fileStorage, creditCardManager: creditCardManager}
+func NewServer(cfg config.Config, storage storager, userManager UserManager,
+	identityProvider identity.IdentityProvider, fileStorage FileStorager,
+	creditCardManager manager.CreditCardManager, credManager manager.CredentialsManager) Server {
+	return Server{storage: storage,
+		cfg:               cfg,
+		userManager:       userManager,
+		identityProvider:  identityProvider,
+		fileStorage:       fileStorage,
+		creditCardManager: creditCardManager,
+		credManager:       credManager}
 }
 
-type Storager interface {
-	AddUser(ctx context.Context, login string, password string) error
-	GetUser(ctx context.Context, login string) (model.User, error)
+type storager interface {
+	userStorager
+	credentialsStorager
+	creditCardStorager
+}
+
+type fileStorager interface {
+	AddText(ctx context.Context, userId uint, content string, description string) error
+}
+
+type credentialsStorager interface {
 	AddCredentials(ctx context.Context, userId uint, login []byte, password []byte) error
-	GetCredentials(ctx context.Context, userId uint) error
+	GetCredentials(ctx context.Context, userId uint) ([]model.Credentials, error)
 	DeleteCredentials(ctx context.Context, id uint) error
 	UpdateCredentials(ctx context.Context, cred dto.Credentials) error
+}
+
+type userStorager interface {
+	AddUser(ctx context.Context, login string, password string) error
+	GetUser(ctx context.Context, login string) (model.User, error)
+}
+
+type creditCardStorager interface {
 	AddCreditCard(ctx context.Context, userId uint, number []byte, ext []byte, cvv []byte, description string) error
 	DeleteCreditCard(ctx context.Context, id uint) error
 	GetCreditCards(ctx context.Context, userId uint) ([]model.CreditCard, error)

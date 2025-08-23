@@ -1,3 +1,4 @@
+// Содержит методы для работы с пользователем
 package postgre
 
 import (
@@ -9,6 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Сохраняет нового пользователя в Бд
 func (s PgStorage) AddUser(ctx context.Context, login string, password string) error {
 	db := s.db.WithContext(ctx)
 	db.Begin()
@@ -35,6 +37,7 @@ func (s PgStorage) AddUser(ctx context.Context, login string, password string) e
 	}
 }
 
+// Получение информации о пользователи по логину
 func (s *PgStorage) GetUser(ctx context.Context, login string) (model.User, error) {
 	var user model.User
 	result := s.db.WithContext(ctx).Where("name = ?", login).First(&user)

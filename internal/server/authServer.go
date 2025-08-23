@@ -1,3 +1,4 @@
+// Методы сервера авторизации и аутентификации
 package server
 
 import (
@@ -11,6 +12,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// Аутентификация пользователя по логину и паролю
+// Возвращает токен пользователя
 func (s *Server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	userInfo, err := s.storage.GetUser(ctx, req.Login)
 	if err != nil {
@@ -27,6 +30,7 @@ func (s *Server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResp
 	return &pb.LoginResponse{Token: token}, nil
 }
 
+// Регистрация нового пользователя
 func (s *Server) Registration(ctx context.Context, req *pb.NewUserRequest) (*pb.NewUserResponse, error) {
 	resp := &pb.NewUserResponse{}
 	return resp, s.userManager.CreateUser(ctx, req.Login, req.Password)

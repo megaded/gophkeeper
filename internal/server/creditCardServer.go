@@ -4,11 +4,10 @@ import (
 	"context"
 	"gophkeeper/internal/server/dto"
 	pb "gophkeeper/proto"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
+// Возвращает список банковских карт пользователя
+// Пользователь определяется по переданому токену
 func (s *Server) GetCreditCardList(ctx context.Context, req *pb.CreditCardRequest) (*pb.CreditCardListResponse, error) {
 	userId, err := getUserId(ctx)
 	if err != nil {
@@ -26,10 +25,22 @@ func (s *Server) GetCreditCardList(ctx context.Context, req *pb.CreditCardReques
 	return &resp, err
 }
 
-func (s *Server) DeleteCreditCard(context.Context, *pb.DeleteCreditCardRequest) (*pb.DeleteCreditCardResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteCreditCard not implemented")
+// Удаление банковской карты по ID
+// Пользователь определяется по переданому токену
+func (s *Server) DeleteCreditCard(ctx context.Context, req *pb.DeleteCreditCardRequest) (*pb.DeleteCreditCardResponse, error) {
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = s.creditCardManager.DeleteCreditCard(ctx, userId, uint(req.Id))
+	if err != nil {
+		return nil, err
+	}
+	return &pb.DeleteCreditCardResponse{}, nil
 }
 
+// Добавляет тип данных банковская карта
+// Пользователь определяется по переданому токену
 func (s *Server) AddCreditCard(ctx context.Context, req *pb.AddCreditCardRequest) (*pb.AddCreditCardResponse, error) {
 	userId, err := getUserId(ctx)
 	if err != nil {

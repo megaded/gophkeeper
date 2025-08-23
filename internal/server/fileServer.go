@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Загружает бинарный файл произвольной длинны до 5 гигабайт
+// Пользователь определяется по переданому токену
 func (s *Server) UploadBinaryFile(stream grpc.ClientStreamingServer[pb.UploadBinaryFileRequest, pb.UploadBinaryFileResponse]) error {
 	ctx := stream.Context()
 	userId, err := getUserId(ctx)
@@ -53,4 +55,10 @@ func (s *Server) UploadBinaryFile(stream grpc.ClientStreamingServer[pb.UploadBin
 	}
 	logger.Log.Info("Загрузили что-то")
 	return stream.SendAndClose(&pb.UploadBinaryFileResponse{})
+}
+
+// Загружает текстовый файл произвольной длинны до 5 гигабайт
+// Пользователь определяется по переданому токену
+func (s Server) UploadTextFile(grpc.ClientStreamingServer[pb.UploadTextFileRequest, pb.UploadTextFileRequest]) error {
+	panic("неаы")
 }

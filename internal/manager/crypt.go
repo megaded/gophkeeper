@@ -8,6 +8,11 @@ import (
 	"io"
 )
 
+type Crypter interface {
+	Encrypt(content string) ([]byte, error)
+	Decrypt(content []byte) (string, error)
+}
+
 type CryptoManager struct {
 	key string
 }
