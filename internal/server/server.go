@@ -20,14 +20,11 @@ type Server struct {
 	cfg               config.Config
 	userManager       UserManager
 	identityProvider  identity.IdentityProvider
-	fileStorage       FileStorager
+	binaryManager     manager.BinaryManager
 	creditCardManager manager.CreditCardManager
 	credManager       manager.CredentialsManager
+	textManager       manager.TextManager
 	pb.UnimplementedKeeperServer
-}
-
-func (s *Server) DownloadBinaryFile(context.Context, *pb.DownloadBinaryFileRequest) (*pb.UploadBinaryFileResponse, error) {
-	panic("unimplemented")
 }
 
 type FileStorager interface {
@@ -55,15 +52,17 @@ func (s *Server) Start(ctx context.Context) {
 var _ pb.KeeperServer = (*Server)(nil)
 
 func NewServer(cfg config.Config, storage storager, userManager UserManager,
-	identityProvider identity.IdentityProvider, fileStorage FileStorager,
-	creditCardManager manager.CreditCardManager, credManager manager.CredentialsManager) Server {
+	identityProvider identity.IdentityProvider, binaryManager manager.BinaryManager,
+	creditCardManager manager.CreditCardManager, credManager manager.CredentialsManager,
+	textManager manager.TextManager) Server {
 	return Server{storage: storage,
 		cfg:               cfg,
 		userManager:       userManager,
 		identityProvider:  identityProvider,
-		fileStorage:       fileStorage,
+		binaryManager:     binaryManager,
 		creditCardManager: creditCardManager,
-		credManager:       credManager}
+		credManager:       credManager,
+		textManager:       textManager}
 }
 
 type storager interface {
@@ -77,7 +76,7 @@ type fileStorager interface {
 }
 
 type credentialsStorager interface {
-	AddCredentials(ctx context.Context, userId uint, login []byte, password []byte) error
+	AddCredentials(ctx context.Context, userId uint, login []byte, password []byte, description string) error
 	GetCredentials(ctx context.Context, userId uint) ([]model.Credentials, error)
 	DeleteCredentials(ctx context.Context, id uint) error
 	UpdateCredentials(ctx context.Context, cred dto.Credentials) error

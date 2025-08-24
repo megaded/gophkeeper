@@ -139,7 +139,7 @@ service Keeper {
   rpc uploadBinaryFile (stream UploadBinaryFileRequest) returns (UploadBinaryFileResponse);
   rpc uploadTextFile (stream UploadTextFileRequest) returns (UploadTextFileRequest);
   rpc uploadText (UploadTextRequest) returns (UploadTextResponse);
-  rpc downloadBinaryFile (DownloadBinaryFileRequest) returns (UploadBinaryFileResponse);
+  rpc downloadBinaryFile (DownloadBinaryFileRequest) returns (stream DownloadBinaryFileResponse);
   rpc addCreditCard (AddCreditCardRequest) returns (AddCreditCardResponse);
   rpc getCreditCardList(CreditCardRequest) returns (CreditCardListResponse);
   rpc deleteCreditCard(DeleteCreditCardRequest) returns (DeleteCreditCardResponse);

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.31.1
-// source: proto/keeper.proto
+// source: keeper.proto
 
 package keeper
 
@@ -45,7 +45,7 @@ type KeeperClient interface {
 	UploadBinaryFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadBinaryFileRequest, UploadBinaryFileResponse], error)
 	UploadTextFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadTextFileRequest, UploadTextFileRequest], error)
 	UploadText(ctx context.Context, in *UploadTextRequest, opts ...grpc.CallOption) (*UploadTextResponse, error)
-	DownloadBinaryFile(ctx context.Context, in *DownloadBinaryFileRequest, opts ...grpc.CallOption) (*UploadBinaryFileResponse, error)
+	DownloadBinaryFile(ctx context.Context, in *DownloadBinaryFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadBinaryFileResponse], error)
 	AddCreditCard(ctx context.Context, in *AddCreditCardRequest, opts ...grpc.CallOption) (*AddCreditCardResponse, error)
 	GetCreditCardList(ctx context.Context, in *CreditCardRequest, opts ...grpc.CallOption) (*CreditCardListResponse, error)
 	DeleteCreditCard(ctx context.Context, in *DeleteCreditCardRequest, opts ...grpc.CallOption) (*DeleteCreditCardResponse, error)
@@ -145,15 +145,24 @@ func (c *keeperClient) UploadText(ctx context.Context, in *UploadTextRequest, op
 	return out, nil
 }
 
-func (c *keeperClient) DownloadBinaryFile(ctx context.Context, in *DownloadBinaryFileRequest, opts ...grpc.CallOption) (*UploadBinaryFileResponse, error) {
+func (c *keeperClient) DownloadBinaryFile(ctx context.Context, in *DownloadBinaryFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadBinaryFileResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UploadBinaryFileResponse)
-	err := c.cc.Invoke(ctx, Keeper_DownloadBinaryFile_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &Keeper_ServiceDesc.Streams[2], Keeper_DownloadBinaryFile_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[DownloadBinaryFileRequest, DownloadBinaryFileResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Keeper_DownloadBinaryFileClient = grpc.ServerStreamingClient[DownloadBinaryFileResponse]
 
 func (c *keeperClient) AddCreditCard(ctx context.Context, in *AddCreditCardRequest, opts ...grpc.CallOption) (*AddCreditCardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -197,7 +206,7 @@ type KeeperServer interface {
 	UploadBinaryFile(grpc.ClientStreamingServer[UploadBinaryFileRequest, UploadBinaryFileResponse]) error
 	UploadTextFile(grpc.ClientStreamingServer[UploadTextFileRequest, UploadTextFileRequest]) error
 	UploadText(context.Context, *UploadTextRequest) (*UploadTextResponse, error)
-	DownloadBinaryFile(context.Context, *DownloadBinaryFileRequest) (*UploadBinaryFileResponse, error)
+	DownloadBinaryFile(*DownloadBinaryFileRequest, grpc.ServerStreamingServer[DownloadBinaryFileResponse]) error
 	AddCreditCard(context.Context, *AddCreditCardRequest) (*AddCreditCardResponse, error)
 	GetCreditCardList(context.Context, *CreditCardRequest) (*CreditCardListResponse, error)
 	DeleteCreditCard(context.Context, *DeleteCreditCardRequest) (*DeleteCreditCardResponse, error)
@@ -235,8 +244,8 @@ func (UnimplementedKeeperServer) UploadTextFile(grpc.ClientStreamingServer[Uploa
 func (UnimplementedKeeperServer) UploadText(context.Context, *UploadTextRequest) (*UploadTextResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadText not implemented")
 }
-func (UnimplementedKeeperServer) DownloadBinaryFile(context.Context, *DownloadBinaryFileRequest) (*UploadBinaryFileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DownloadBinaryFile not implemented")
+func (UnimplementedKeeperServer) DownloadBinaryFile(*DownloadBinaryFileRequest, grpc.ServerStreamingServer[DownloadBinaryFileResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method DownloadBinaryFile not implemented")
 }
 func (UnimplementedKeeperServer) AddCreditCard(context.Context, *AddCreditCardRequest) (*AddCreditCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCreditCard not implemented")
@@ -390,23 +399,16 @@ func _Keeper_UploadText_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keeper_DownloadBinaryFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DownloadBinaryFileRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _Keeper_DownloadBinaryFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DownloadBinaryFileRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(KeeperServer).DownloadBinaryFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Keeper_DownloadBinaryFile_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).DownloadBinaryFile(ctx, req.(*DownloadBinaryFileRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(KeeperServer).DownloadBinaryFile(m, &grpc.GenericServerStream[DownloadBinaryFileRequest, DownloadBinaryFileResponse]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Keeper_DownloadBinaryFileServer = grpc.ServerStreamingServer[DownloadBinaryFileResponse]
 
 func _Keeper_AddCreditCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddCreditCardRequest)
@@ -494,10 +496,6 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Keeper_UploadText_Handler,
 		},
 		{
-			MethodName: "downloadBinaryFile",
-			Handler:    _Keeper_DownloadBinaryFile_Handler,
-		},
-		{
 			MethodName: "addCreditCard",
 			Handler:    _Keeper_AddCreditCard_Handler,
 		},
@@ -521,6 +519,11 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _Keeper_UploadTextFile_Handler,
 			ClientStreams: true,
 		},
+		{
+			StreamName:    "downloadBinaryFile",
+			Handler:       _Keeper_DownloadBinaryFile_Handler,
+			ServerStreams: true,
+		},
 	},
-	Metadata: "proto/keeper.proto",
+	Metadata: "keeper.proto",
 }

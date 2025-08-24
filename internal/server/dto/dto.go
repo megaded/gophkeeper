@@ -1,6 +1,7 @@
 package dto
 
 type Credentials struct {
+	Id          uint
 	Login       string
 	Password    string
 	Description string
@@ -16,6 +17,7 @@ type Card struct {
 }
 
 type BinaryFile struct {
+	Id          uint
 	UserId      uint
 	FileName    string
 	Description string

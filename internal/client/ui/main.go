@@ -20,12 +20,37 @@ type mainModel struct {
 }
 
 type KeeperClient interface {
+	AuthKeeperClient
+	CreditCardKeeperClient
+	CredentialsKeeperClient
+	BinaryKeeperClient
+}
+
+type AuthKeeperClient interface {
 	Login(ctx context.Context, login string, password string) (token string, err error)
 	Register(ctx context.Context, login string, password string) error
+}
+
+type CreditCardKeeperClient interface {
 	AddCreditCard(ctx context.Context, dto dto.Card) error
-	AddCredentials(ctx context.Context, cred dto.Credentials) error
-	UploadBinaryFile(reader io.Reader, fileName string, description string, size int64) error
 	GetCreditCards(ctx context.Context) ([]dto.Card, error)
+}
+
+type CredentialsKeeperClient interface {
+	AddCredentials(ctx context.Context, cred dto.Credentials) error
+	GetCredentials(ctx context.Context) ([]dto.Credentials, error)
+}
+
+type BinaryKeeperClient interface {
+	UploadBinaryFile(reader io.Reader, fileName string, description string, size int64) error
+	DownloadBinaryFile(id uint) (io.Reader, error)
+	GetBinaryFileList() ([]dto.BinaryFile, error)
+}
+
+type TextKeeperClient interface {
+	UploadTextFile(reader io.Reader, fileName string, description string, size int64) error
+	UploadText(reader io.Reader, fileName string, description string, size int64) error
+	GetTextList() ([]dto.Text, error)
 }
 
 func InitialMainModel() mainModel {

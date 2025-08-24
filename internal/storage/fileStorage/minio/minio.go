@@ -6,6 +6,7 @@ import (
 	"gophkeeper/internal/logger"
 	"io"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -64,6 +65,19 @@ func (m *MinioStorage) UploadFile(ctx context.Context, userId string, fileName s
 		return "", err
 	}
 	return externalName, err
+}
+
+func (m *MinioStorage) DownloadFile(ctx context.Context, userId uint, fileName string) (io.Reader, error) {
+	bucketName := getBucketName(strconv.Itoa(int(userId)))
+	r, err := m.client.GetObject(ctx, bucketName, fileName, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
+func (m MinioStorage) DeleteFile(ctx context.Context, userId uint, name string) {
+	panic(" MinioStorage DeleteFile")
 }
 
 func getBucketName(userId string) string {

@@ -1,29 +1,50 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"gophkeeper/internal/client/ui"
+	"gophkeeper/internal/client/proto"
 	"gophkeeper/internal/logger"
-	"os"
-
-	tea "github.com/charmbracelet/bubbletea"
+	"gophkeeper/internal/server/dto"
 )
 
 func main() {
 	logger.SetupLogger("info")
-	/* client := proto.NewKeeperClient()
+	client := proto.NewKeeperClient()
 
 	_, err := client.Login(context.Background(), "1234", "1234")
 	if err != nil {
 		logger.Log.Error(err.Error())
 	}
 	client.AddCreditCard(context.Background(), dto.Card{Number: "111111", Description: "Хуй", CVV: "1345", Exp: "2020"})
-	r, err := client.GetCreditCards(context.Background())
-	fmt.Println(r) */
-	if _, err := tea.NewProgram(ui.InitialMainModel()).Run(); err != nil {
+	if err != nil {
+		fmt.Println(err)
+	}
+	cards, err := client.GetCreditCards(context.Background())
+	if err != nil {
+		fmt.Println(err)
+	}
+	if err == nil {
+		fmt.Println(cards)
+	}
+
+	err = client.AddCredentials(context.Background(), dto.Credentials{Login: "1111", Password: "gfg", Description: "454545"})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	creds, err := client.GetCreditCards(context.Background())
+	if err != nil {
+		fmt.Println(err)
+	}
+	if err == nil {
+		fmt.Println(creds)
+	}
+
+	/* if _, err := tea.NewProgram(ui.InitialMainModel()).Run(); err != nil {
 		fmt.Printf("could not start program: %s\n", err)
 		os.Exit(1)
-	}
+	} */
 
 	//client := proto.NewKeeperClient()
 

@@ -24,8 +24,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	creditCardManage := manager.NewCreditCardManager(cfg, storage)
-	server := server.NewServer(cfg, &storage, userManager, identity, fileStorage, creditCardManage)
+	binaryManager := manager.NewBinaryManager(fileStorage, storage)
+	creditCardManager := manager.NewCreditCardManager(cfg, storage)
+	crypter := manager.NewCryptoManager(cfg)
+	credManager := manager.NewCredentialsManager(&crypter, storage)
+	textManager := manager.NewTextManager(storage)
+	server := server.NewServer(cfg, &storage, userManager, identity, binaryManager, creditCardManager, credManager, textManager)
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		sigChan := make(chan os.Signal, 1)

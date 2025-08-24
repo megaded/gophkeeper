@@ -13,6 +13,10 @@ type CredentialsManager struct {
 	storage       credentialsStorager
 }
 
+func NewCredentialsManager(cryptoManager Crypter, storage credentialsStorager) CredentialsManager {
+	return CredentialsManager{cryptoManager: cryptoManager, storage: storage}
+}
+
 // Добавляет тип данных логин\пароль для пользователя
 func (c CredentialsManager) AddCredentials(ctx context.Context, userId uint, cred dto.Credentials) error {
 	login, err := c.cryptoManager.Encrypt(cred.Login)

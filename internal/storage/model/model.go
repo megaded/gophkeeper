@@ -44,6 +44,7 @@ type Binary struct {
 type Text struct {
 	KeeperInfo
 	gorm.Model
+	Content  string
 	BinaryId uint
 	Binary   Binary
 	IsFile   bool
