@@ -68,7 +68,7 @@ func NewCreditCardListModel(client KeeperClient) creditCardListModel {
 
 	items := make([]list.Item, 0, len(cards))
 	for _, k := range cards {
-		items = append(items, creditCard{number: k.Number, exp: k.Exp, description: k.Description, cvv: k.CVV})
+		items = append(items, creditCard{number: k.Number, exp: k.Exp, description: k.Description, cvv: k.CVV, id: k.Id})
 	}
 	m := creditCardListModel{client: client, list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.list.Title = "Список карт"

@@ -4,50 +4,52 @@ import (
 	"bufio"
 	"context"
 	fileutil "gophkeeper/internal/client/proto/fileUtil"
-	"gophkeeper/internal/logger"
 	"gophkeeper/internal/server/dto"
 	pb "gophkeeper/proto"
 	"io"
-
-	"go.uber.org/zap"
+	"os"
 )
 
-func (c *keeperClient) UploadBinaryFile(reader io.Reader, fileName string, description string) error {
+func (c *keeperClient) UploadBinaryFile(filePath string, description string) error {
 	ctx, err := getCtx(c.token)
 	if err != nil {
-		logger.Log.Error(err.Error())
 		return err
 	}
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	fStat, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	fileName := fStat.Name()
 	k, err := c.client.UploadBinaryFile(ctx)
 	if err != nil {
-		logger.Log.Error(err.Error())
 		return err
 	}
 
-	buf := bufio.NewReader(reader)
+	buf := bufio.NewReader(file)
 	data := make([]byte, buf.Size())
 	var totalSize int64 = 0
 	for err != io.EOF {
 		b, err := buf.Read(data)
 		totalSize = totalSize + int64(b)
 		if err == io.EOF {
-			logger.Log.Info("байтов", zap.Int64("всего", totalSize))
-			logger.Log.Info("Конец файла")
 			break
 		}
 		err = k.Send(&pb.UploadBinaryFileRequest{Content: data, Filename: fileName, Description: description})
 		if err != nil && err != io.EOF {
 			_, err = k.CloseAndRecv()
-			logger.Log.Error(err.Error())
 			return err
 		}
 	}
 	_, err = k.CloseAndRecv()
-	logger.Log.Info("Закончили отправку")
 	if err != nil && err != io.EOF {
-		logger.Log.Error(err.Error())
+		return err
 	}
-	return err
+	return nil
 }
 
 func (c *keeperClient) DownloadBinaryFile(ctx context.Context, id uint) error {

@@ -20,7 +20,10 @@ const (
 )
 
 var (
-	dictDataTypeRender = map[dataType]func(KeeperClient) tea.Model{card: func(kc KeeperClient) tea.Model { return NewCreditCardListModel(kc) }}
+	dictDataTypeRender = map[dataType]func(KeeperClient) tea.Model{
+		card:   func(kc KeeperClient) tea.Model { return NewCreditCardListModel(kc) },
+		binary: func(kc KeeperClient) tea.Model { return NewUploadFileModel(kc) },
+	}
 )
 
 const listHeight = 14
