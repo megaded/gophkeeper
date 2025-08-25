@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gophkeeper/internal/client/proto"
 	"gophkeeper/internal/logger"
-	"gophkeeper/internal/server/dto"
+	"os"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		logger.Log.Error(err.Error())
 	}
-	client.AddCreditCard(context.Background(), dto.Card{Number: "111111", Description: "Хуй", CVV: "1345", Exp: "2020"})
+	/* client.AddCreditCard(context.Background(), dto.Card{Number: "111111", Description: "Хуй", CVV: "1345", Exp: "2020"})
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -25,6 +25,7 @@ func main() {
 		fmt.Println(err)
 	}
 	if err == nil {
+		fmt.Println("Карты")
 		fmt.Println(cards)
 	}
 
@@ -33,22 +34,16 @@ func main() {
 		fmt.Println(err)
 	}
 
-	creds, err := client.GetCreditCards(context.Background())
+	creds, err := client.GetCredentials(context.Background())
 	if err != nil {
 		fmt.Println(err)
 	}
 	if err == nil {
+		fmt.Println("Креды")
 		fmt.Println(creds)
-	}
-
-	/* if _, err := tea.NewProgram(ui.InitialMainModel()).Run(); err != nil {
-		fmt.Printf("could not start program: %s\n", err)
-		os.Exit(1)
 	} */
 
-	//client := proto.NewKeeperClient()
-
-	/* var filePath = "I:/Torrents/God Is a Bullet (2023)WEB-DLRip-AVC.mkv"
+	var filePath = "I:/ChromeDownload/vv-2.zip"
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -58,19 +53,25 @@ func main() {
 	if err != nil {
 		logger.Log.Error(err.Error())
 	}
-	size := s.Size()
-	name := s.Name()
-	logger.Log.Info(name)
-	logger.Log.Info(fmt.Sprint(size)) */
-	/* cfg := config.GetConfig()
-	minio, err := minio.NewStorage(cfg)
-	err = minio.UploadFile(context.Background(), "keeperrr", name, file, size)
+	err = client.UploadBinaryFile(file, s.Name(), "описание")
 	if err != nil {
 		logger.Log.Error(err.Error())
-	} */
-	/* err = client.UploadBinaryFile(file, name, "описание", size)
+	}
+	files, err := client.GetBinaryFileList(context.Background())
 	if err != nil {
 		logger.Log.Error(err.Error())
+	}
+	fmt.Println(files)
+	err = client.DownloadBinaryFile(context.Background(), files[0].Id)
+	if err != nil {
+		logger.Log.Error(err.Error())
+	}
+
+	/* if _, err := tea.NewProgram(ui.InitialMainModel()).Run(); err != nil {
+		fmt.Printf("could not start program: %s\n", err)
+		os.Exit(1)
 	} */
+
+	//client := proto.NewKeeperClient()
 
 }

@@ -42,9 +42,9 @@ type CredentialsKeeperClient interface {
 }
 
 type BinaryKeeperClient interface {
-	UploadBinaryFile(reader io.Reader, fileName string, description string, size int64) error
-	DownloadBinaryFile(id uint) (io.Reader, error)
-	GetBinaryFileList() ([]dto.BinaryFile, error)
+	UploadBinaryFile(reader io.Reader, fileName string, description string) error
+	DownloadBinaryFile(ctx context.Context, id uint) error
+	GetBinaryFileList(ctx context.Context) ([]dto.BinaryFile, error)
 }
 
 type TextKeeperClient interface {

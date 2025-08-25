@@ -27,6 +27,7 @@ const (
 	Keeper_UploadBinaryFile_FullMethodName   = "/keeper_proto.Keeper/uploadBinaryFile"
 	Keeper_UploadTextFile_FullMethodName     = "/keeper_proto.Keeper/uploadTextFile"
 	Keeper_UploadText_FullMethodName         = "/keeper_proto.Keeper/uploadText"
+	Keeper_GetBinaryFileList_FullMethodName  = "/keeper_proto.Keeper/getBinaryFileList"
 	Keeper_DownloadBinaryFile_FullMethodName = "/keeper_proto.Keeper/downloadBinaryFile"
 	Keeper_AddCreditCard_FullMethodName      = "/keeper_proto.Keeper/addCreditCard"
 	Keeper_GetCreditCardList_FullMethodName  = "/keeper_proto.Keeper/getCreditCardList"
@@ -45,6 +46,7 @@ type KeeperClient interface {
 	UploadBinaryFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadBinaryFileRequest, UploadBinaryFileResponse], error)
 	UploadTextFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadTextFileRequest, UploadTextFileRequest], error)
 	UploadText(ctx context.Context, in *UploadTextRequest, opts ...grpc.CallOption) (*UploadTextResponse, error)
+	GetBinaryFileList(ctx context.Context, in *BinaryFileListRequest, opts ...grpc.CallOption) (*BinaryFileListResponse, error)
 	DownloadBinaryFile(ctx context.Context, in *DownloadBinaryFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadBinaryFileResponse], error)
 	AddCreditCard(ctx context.Context, in *AddCreditCardRequest, opts ...grpc.CallOption) (*AddCreditCardResponse, error)
 	GetCreditCardList(ctx context.Context, in *CreditCardRequest, opts ...grpc.CallOption) (*CreditCardListResponse, error)
@@ -145,6 +147,16 @@ func (c *keeperClient) UploadText(ctx context.Context, in *UploadTextRequest, op
 	return out, nil
 }
 
+func (c *keeperClient) GetBinaryFileList(ctx context.Context, in *BinaryFileListRequest, opts ...grpc.CallOption) (*BinaryFileListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BinaryFileListResponse)
+	err := c.cc.Invoke(ctx, Keeper_GetBinaryFileList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *keeperClient) DownloadBinaryFile(ctx context.Context, in *DownloadBinaryFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadBinaryFileResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &Keeper_ServiceDesc.Streams[2], Keeper_DownloadBinaryFile_FullMethodName, cOpts...)
@@ -206,6 +218,7 @@ type KeeperServer interface {
 	UploadBinaryFile(grpc.ClientStreamingServer[UploadBinaryFileRequest, UploadBinaryFileResponse]) error
 	UploadTextFile(grpc.ClientStreamingServer[UploadTextFileRequest, UploadTextFileRequest]) error
 	UploadText(context.Context, *UploadTextRequest) (*UploadTextResponse, error)
+	GetBinaryFileList(context.Context, *BinaryFileListRequest) (*BinaryFileListResponse, error)
 	DownloadBinaryFile(*DownloadBinaryFileRequest, grpc.ServerStreamingServer[DownloadBinaryFileResponse]) error
 	AddCreditCard(context.Context, *AddCreditCardRequest) (*AddCreditCardResponse, error)
 	GetCreditCardList(context.Context, *CreditCardRequest) (*CreditCardListResponse, error)
@@ -243,6 +256,9 @@ func (UnimplementedKeeperServer) UploadTextFile(grpc.ClientStreamingServer[Uploa
 }
 func (UnimplementedKeeperServer) UploadText(context.Context, *UploadTextRequest) (*UploadTextResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadText not implemented")
+}
+func (UnimplementedKeeperServer) GetBinaryFileList(context.Context, *BinaryFileListRequest) (*BinaryFileListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBinaryFileList not implemented")
 }
 func (UnimplementedKeeperServer) DownloadBinaryFile(*DownloadBinaryFileRequest, grpc.ServerStreamingServer[DownloadBinaryFileResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method DownloadBinaryFile not implemented")
@@ -399,6 +415,24 @@ func _Keeper_UploadText_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Keeper_GetBinaryFileList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BinaryFileListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).GetBinaryFileList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_GetBinaryFileList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).GetBinaryFileList(ctx, req.(*BinaryFileListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Keeper_DownloadBinaryFile_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(DownloadBinaryFileRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -494,6 +528,10 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "uploadText",
 			Handler:    _Keeper_UploadText_Handler,
+		},
+		{
+			MethodName: "getBinaryFileList",
+			Handler:    _Keeper_GetBinaryFileList_Handler,
 		},
 		{
 			MethodName: "addCreditCard",

@@ -37,7 +37,7 @@ func (s *Server) Start(ctx context.Context) {
 		panic(err)
 	}
 	authInterceptor := interceptor.GetAuthInterceptor(s.identityProvider)
-	server := grpc.NewServer(grpc.UnaryInterceptor(authInterceptor.UnaryInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(authInterceptor.UnaryAuthInterceptor), grpc.StreamInterceptor(authInterceptor.StreamingAuthInterceptor))
 
 	go func() {
 		<-ctx.Done()

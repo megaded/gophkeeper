@@ -7,8 +7,10 @@ import (
 	"io"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"go.uber.org/zap"
@@ -59,7 +61,7 @@ func (m *MinioStorage) UploadFile(ctx context.Context, userId string, fileName s
 			return "", err
 		}
 	}
-	_, err = m.client.PutObject(context.TODO(), bucketPrefix, externalName, reader, -1, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err = m.client.PutObject(context.TODO(), bucketName, externalName, reader, -1, minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		logger.Log.Error("Minio. Загрузка файла", zap.Error(err))
 		return "", err
@@ -67,8 +69,10 @@ func (m *MinioStorage) UploadFile(ctx context.Context, userId string, fileName s
 	return externalName, err
 }
 
+// Скачивание файла
 func (m *MinioStorage) DownloadFile(ctx context.Context, userId uint, fileName string) (io.Reader, error) {
-	bucketName := getBucketName(strconv.Itoa(int(userId)))
+	userIdStr := strconv.Itoa(int(userId))
+	bucketName := getBucketName(userIdStr)
 	r, err := m.client.GetObject(ctx, bucketName, fileName, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, err
@@ -76,6 +80,7 @@ func (m *MinioStorage) DownloadFile(ctx context.Context, userId uint, fileName s
 	return r, nil
 }
 
+// Удаление
 func (m MinioStorage) DeleteFile(ctx context.Context, userId uint, name string) {
 	panic(" MinioStorage DeleteFile")
 }
@@ -86,5 +91,8 @@ func getBucketName(userId string) string {
 
 func generateFileName(originalName string) string {
 	ext := filepath.Ext(originalName)
-	return ext
+	var sb strings.Builder
+	sb.WriteString(uuid.NewString())
+	sb.WriteString(ext)
+	return sb.String()
 }

@@ -62,6 +62,18 @@ func (b BinaryManager) DownloadFile(ctx context.Context, userId uint, id uint) (
 
 }
 
+func (b BinaryManager) GetBinaryFiles(ctx context.Context, userId uint) ([]dto.BinaryFile, error) {
+	files, err := b.storager.GetBinaryFiles(ctx, userId)
+	if err != nil {
+		return nil, nil
+	}
+	result := make([]dto.BinaryFile, 0, len(files))
+	for _, f := range files {
+		result = append(result, dto.BinaryFile{Id: f.ID, FileName: f.OriginalFileName, Description: f.Description})
+	}
+	return result, err
+}
+
 type fileStorager interface {
 	UploadFile(ctx context.Context, userId string, fileName string, reader io.Reader) (string, error)
 	DeleteFile(ctx context.Context, userId uint, name string)
@@ -72,4 +84,5 @@ type fileMetaStorager interface {
 	AddBinary(ctx context.Context, userId uint, description string, originalFileName string, externalFileName string) (uint, error)
 	AddTextFile(ctx context.Context, userId uint, description string, binaryId uint) error
 	GetFileInfo(ctx context.Context, fileId uint) (model.Binary, error)
+	GetBinaryFiles(ctx context.Context, userId uint) ([]model.Binary, error)
 }

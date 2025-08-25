@@ -9,7 +9,11 @@ import (
 
 func (c *keeperClient) AddCredentials(ctx context.Context, cred dto.Credentials) error {
 	req := &pb.AddCredentialsRequest{Login: cred.Login, Password: cred.Password, Description: cred.Description}
-	_, err := c.client.AddCredentials(ctx, req)
+	ctx, err := getCtx(c.token)
+	if err != nil {
+		return err
+	}
+	_, err = c.client.AddCredentials(ctx, req)
 	return err
 }
 

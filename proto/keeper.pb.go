@@ -1245,6 +1245,146 @@ func (*DeleteCreditCardResponse) Descriptor() ([]byte, []int) {
 	return file_keeper_proto_rawDescGZIP(), []int{25}
 }
 
+type BinaryFileListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BinaryFileListRequest) Reset() {
+	*x = BinaryFileListRequest{}
+	mi := &file_keeper_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BinaryFileListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BinaryFileListRequest) ProtoMessage() {}
+
+func (x *BinaryFileListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BinaryFileListRequest.ProtoReflect.Descriptor instead.
+func (*BinaryFileListRequest) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{26}
+}
+
+type BinaryFile struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Id            uint32                 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BinaryFile) Reset() {
+	*x = BinaryFile{}
+	mi := &file_keeper_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BinaryFile) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BinaryFile) ProtoMessage() {}
+
+func (x *BinaryFile) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BinaryFile.ProtoReflect.Descriptor instead.
+func (*BinaryFile) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *BinaryFile) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *BinaryFile) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BinaryFile) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type BinaryFileListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BinaryFiles   []*BinaryFile          `protobuf:"bytes,1,rep,name=binaryFiles,proto3" json:"binaryFiles,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BinaryFileListResponse) Reset() {
+	*x = BinaryFileListResponse{}
+	mi := &file_keeper_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BinaryFileListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BinaryFileListResponse) ProtoMessage() {}
+
+func (x *BinaryFileListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_keeper_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BinaryFileListResponse.ProtoReflect.Descriptor instead.
+func (*BinaryFileListResponse) Descriptor() ([]byte, []int) {
+	return file_keeper_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *BinaryFileListResponse) GetBinaryFiles() []*BinaryFile {
+	if x != nil {
+		return x.BinaryFiles
+	}
+	return nil
+}
+
 var File_keeper_proto protoreflect.FileDescriptor
 
 const file_keeper_proto_rawDesc = "" +
@@ -1313,7 +1453,15 @@ const file_keeper_proto_rawDesc = "" +
 	"\vcreditCards\x18\x01 \x03(\v2\x18.keeper_proto.CreditCardR\vcreditCards\")\n" +
 	"\x17DeleteCreditCardRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"\x1a\n" +
-	"\x18DeleteCreditCardResponse2\xd0\b\n" +
+	"\x18DeleteCreditCardResponse\"\x17\n" +
+	"\x15BinaryFileListRequest\"R\n" +
+	"\n" +
+	"BinaryFile\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\rR\x02id\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\"T\n" +
+	"\x16BinaryFileListResponse\x12:\n" +
+	"\vbinaryFiles\x18\x01 \x03(\v2\x18.keeper_proto.BinaryFileR\vbinaryFiles2\xb0\t\n" +
 	"\x06Keeper\x12K\n" +
 	"\fregistration\x12\x1c.keeper_proto.NewUserRequest\x1a\x1d.keeper_proto.NewUserResponse\x12@\n" +
 	"\x05login\x12\x1a.keeper_proto.LoginRequest\x1a\x1b.keeper_proto.LoginResponse\x12[\n" +
@@ -1323,7 +1471,8 @@ const file_keeper_proto_rawDesc = "" +
 	"\x10uploadBinaryFile\x12%.keeper_proto.UploadBinaryFileRequest\x1a&.keeper_proto.UploadBinaryFileResponse(\x01\x12\\\n" +
 	"\x0euploadTextFile\x12#.keeper_proto.UploadTextFileRequest\x1a#.keeper_proto.UploadTextFileRequest(\x01\x12O\n" +
 	"\n" +
-	"uploadText\x12\x1f.keeper_proto.UploadTextRequest\x1a .keeper_proto.UploadTextResponse\x12i\n" +
+	"uploadText\x12\x1f.keeper_proto.UploadTextRequest\x1a .keeper_proto.UploadTextResponse\x12^\n" +
+	"\x11getBinaryFileList\x12#.keeper_proto.BinaryFileListRequest\x1a$.keeper_proto.BinaryFileListResponse\x12i\n" +
 	"\x12downloadBinaryFile\x12'.keeper_proto.DownloadBinaryFileRequest\x1a(.keeper_proto.DownloadBinaryFileResponse0\x01\x12X\n" +
 	"\raddCreditCard\x12\".keeper_proto.AddCreditCardRequest\x1a#.keeper_proto.AddCreditCardResponse\x12Z\n" +
 	"\x11getCreditCardList\x12\x1f.keeper_proto.CreditCardRequest\x1a$.keeper_proto.CreditCardListResponse\x12a\n" +
@@ -1341,7 +1490,7 @@ func file_keeper_proto_rawDescGZIP() []byte {
 	return file_keeper_proto_rawDescData
 }
 
-var file_keeper_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_keeper_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_keeper_proto_goTypes = []any{
 	(*NewUserRequest)(nil),             // 0: keeper_proto.NewUserRequest
 	(*NewUserResponse)(nil),            // 1: keeper_proto.NewUserResponse
@@ -1369,39 +1518,45 @@ var file_keeper_proto_goTypes = []any{
 	(*CreditCardListResponse)(nil),     // 23: keeper_proto.CreditCardListResponse
 	(*DeleteCreditCardRequest)(nil),    // 24: keeper_proto.DeleteCreditCardRequest
 	(*DeleteCreditCardResponse)(nil),   // 25: keeper_proto.DeleteCreditCardResponse
+	(*BinaryFileListRequest)(nil),      // 26: keeper_proto.BinaryFileListRequest
+	(*BinaryFile)(nil),                 // 27: keeper_proto.BinaryFile
+	(*BinaryFileListResponse)(nil),     // 28: keeper_proto.BinaryFileListResponse
 }
 var file_keeper_proto_depIdxs = []int32{
 	6,  // 0: keeper_proto.CredentialListResponse.credentials:type_name -> keeper_proto.Credential
 	21, // 1: keeper_proto.CreditCardListResponse.creditCards:type_name -> keeper_proto.CreditCard
-	0,  // 2: keeper_proto.Keeper.registration:input_type -> keeper_proto.NewUserRequest
-	2,  // 3: keeper_proto.Keeper.login:input_type -> keeper_proto.LoginRequest
-	4,  // 4: keeper_proto.Keeper.addCredentials:input_type -> keeper_proto.AddCredentialsRequest
-	7,  // 5: keeper_proto.Keeper.getCredentialsList:input_type -> keeper_proto.CredentialListRequest
-	9,  // 6: keeper_proto.Keeper.deleteCredential:input_type -> keeper_proto.DeleteCredentialRequest
-	11, // 7: keeper_proto.Keeper.uploadBinaryFile:input_type -> keeper_proto.UploadBinaryFileRequest
-	15, // 8: keeper_proto.Keeper.uploadTextFile:input_type -> keeper_proto.UploadTextFileRequest
-	17, // 9: keeper_proto.Keeper.uploadText:input_type -> keeper_proto.UploadTextRequest
-	13, // 10: keeper_proto.Keeper.downloadBinaryFile:input_type -> keeper_proto.DownloadBinaryFileRequest
-	19, // 11: keeper_proto.Keeper.addCreditCard:input_type -> keeper_proto.AddCreditCardRequest
-	22, // 12: keeper_proto.Keeper.getCreditCardList:input_type -> keeper_proto.CreditCardRequest
-	24, // 13: keeper_proto.Keeper.deleteCreditCard:input_type -> keeper_proto.DeleteCreditCardRequest
-	1,  // 14: keeper_proto.Keeper.registration:output_type -> keeper_proto.NewUserResponse
-	3,  // 15: keeper_proto.Keeper.login:output_type -> keeper_proto.LoginResponse
-	5,  // 16: keeper_proto.Keeper.addCredentials:output_type -> keeper_proto.AddCredentialsResponse
-	8,  // 17: keeper_proto.Keeper.getCredentialsList:output_type -> keeper_proto.CredentialListResponse
-	10, // 18: keeper_proto.Keeper.deleteCredential:output_type -> keeper_proto.DeleteCredentialResponse
-	12, // 19: keeper_proto.Keeper.uploadBinaryFile:output_type -> keeper_proto.UploadBinaryFileResponse
-	15, // 20: keeper_proto.Keeper.uploadTextFile:output_type -> keeper_proto.UploadTextFileRequest
-	18, // 21: keeper_proto.Keeper.uploadText:output_type -> keeper_proto.UploadTextResponse
-	14, // 22: keeper_proto.Keeper.downloadBinaryFile:output_type -> keeper_proto.DownloadBinaryFileResponse
-	20, // 23: keeper_proto.Keeper.addCreditCard:output_type -> keeper_proto.AddCreditCardResponse
-	23, // 24: keeper_proto.Keeper.getCreditCardList:output_type -> keeper_proto.CreditCardListResponse
-	25, // 25: keeper_proto.Keeper.deleteCreditCard:output_type -> keeper_proto.DeleteCreditCardResponse
-	14, // [14:26] is the sub-list for method output_type
-	2,  // [2:14] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	27, // 2: keeper_proto.BinaryFileListResponse.binaryFiles:type_name -> keeper_proto.BinaryFile
+	0,  // 3: keeper_proto.Keeper.registration:input_type -> keeper_proto.NewUserRequest
+	2,  // 4: keeper_proto.Keeper.login:input_type -> keeper_proto.LoginRequest
+	4,  // 5: keeper_proto.Keeper.addCredentials:input_type -> keeper_proto.AddCredentialsRequest
+	7,  // 6: keeper_proto.Keeper.getCredentialsList:input_type -> keeper_proto.CredentialListRequest
+	9,  // 7: keeper_proto.Keeper.deleteCredential:input_type -> keeper_proto.DeleteCredentialRequest
+	11, // 8: keeper_proto.Keeper.uploadBinaryFile:input_type -> keeper_proto.UploadBinaryFileRequest
+	15, // 9: keeper_proto.Keeper.uploadTextFile:input_type -> keeper_proto.UploadTextFileRequest
+	17, // 10: keeper_proto.Keeper.uploadText:input_type -> keeper_proto.UploadTextRequest
+	26, // 11: keeper_proto.Keeper.getBinaryFileList:input_type -> keeper_proto.BinaryFileListRequest
+	13, // 12: keeper_proto.Keeper.downloadBinaryFile:input_type -> keeper_proto.DownloadBinaryFileRequest
+	19, // 13: keeper_proto.Keeper.addCreditCard:input_type -> keeper_proto.AddCreditCardRequest
+	22, // 14: keeper_proto.Keeper.getCreditCardList:input_type -> keeper_proto.CreditCardRequest
+	24, // 15: keeper_proto.Keeper.deleteCreditCard:input_type -> keeper_proto.DeleteCreditCardRequest
+	1,  // 16: keeper_proto.Keeper.registration:output_type -> keeper_proto.NewUserResponse
+	3,  // 17: keeper_proto.Keeper.login:output_type -> keeper_proto.LoginResponse
+	5,  // 18: keeper_proto.Keeper.addCredentials:output_type -> keeper_proto.AddCredentialsResponse
+	8,  // 19: keeper_proto.Keeper.getCredentialsList:output_type -> keeper_proto.CredentialListResponse
+	10, // 20: keeper_proto.Keeper.deleteCredential:output_type -> keeper_proto.DeleteCredentialResponse
+	12, // 21: keeper_proto.Keeper.uploadBinaryFile:output_type -> keeper_proto.UploadBinaryFileResponse
+	15, // 22: keeper_proto.Keeper.uploadTextFile:output_type -> keeper_proto.UploadTextFileRequest
+	18, // 23: keeper_proto.Keeper.uploadText:output_type -> keeper_proto.UploadTextResponse
+	28, // 24: keeper_proto.Keeper.getBinaryFileList:output_type -> keeper_proto.BinaryFileListResponse
+	14, // 25: keeper_proto.Keeper.downloadBinaryFile:output_type -> keeper_proto.DownloadBinaryFileResponse
+	20, // 26: keeper_proto.Keeper.addCreditCard:output_type -> keeper_proto.AddCreditCardResponse
+	23, // 27: keeper_proto.Keeper.getCreditCardList:output_type -> keeper_proto.CreditCardListResponse
+	25, // 28: keeper_proto.Keeper.deleteCreditCard:output_type -> keeper_proto.DeleteCreditCardResponse
+	16, // [16:29] is the sub-list for method output_type
+	3,  // [3:16] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_keeper_proto_init() }
@@ -1415,7 +1570,7 @@ func file_keeper_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_keeper_proto_rawDesc), len(file_keeper_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -3,7 +3,11 @@ package postgre
 
 import (
 	"context"
+	"errors"
+	"gophkeeper/internal/internal_error"
 	"gophkeeper/internal/storage/model"
+
+	"gorm.io/gorm"
 )
 
 func (s PgStorage) AddBinary(ctx context.Context, userId uint, description string, originalFileName string, externalFileName string) (uint, error) {
@@ -38,4 +42,26 @@ func (s PgStorage) AddTextFile(ctx context.Context, userId uint, description str
 		return r.Error
 	}
 	return nil
+}
+func (s PgStorage) GetFileInfo(ctx context.Context, fileId uint) (model.Binary, error) {
+	var model model.Binary
+	result := s.db.WithContext(ctx).Where("id = ?", fileId).First(&model)
+	switch {
+	case errors.Is(result.Error, gorm.ErrRecordNotFound):
+		return model, internal_error.ErrUserNotFound
+	default:
+		return model, result.Error
+	}
+}
+
+// Возвращает список данных логин\пароль по Id юзера
+func (s PgStorage) GetBinaryFiles(ctx context.Context, userId uint) ([]model.Binary, error) {
+	var model []model.Binary
+	result := s.db.WithContext(ctx).Where("user_id = ?", userId).Find(&model)
+	switch {
+	case errors.Is(result.Error, gorm.ErrRecordNotFound):
+		return nil, internal_error.ErrRecordNotFound
+	default:
+		return model, result.Error
+	}
 }

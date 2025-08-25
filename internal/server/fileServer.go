@@ -1,7 +1,6 @@
 package server
 
 import (
-	"bufio"
 	"context"
 	"gophkeeper/internal/logger"
 	"gophkeeper/internal/server/dto"
@@ -58,7 +57,7 @@ func (s *Server) UploadBinaryFile(stream grpc.ClientStreamingServer[pb.UploadBin
 }
 
 func (s *Server) DownloadBinaryFile(req *pb.DownloadBinaryFileRequest, resp grpc.ServerStreamingServer[pb.DownloadBinaryFileResponse]) error {
-	logger.Log.Info("Начинаем загрузку файла %s", zap.Int64("id", req.Id))
+	logger.Log.Info("Начинаем загрузку файла", zap.Int64("id", req.Id))
 	ctx := resp.Context()
 	userId, err := getUserId(ctx)
 	if err != nil {
@@ -68,22 +67,38 @@ func (s *Server) DownloadBinaryFile(req *pb.DownloadBinaryFileRequest, resp grpc
 	if err != nil {
 		return err
 	}
-	buf := bufio.NewReader(reader)
-	data := make([]byte, buf.Size())
-	var totalSize int64 = 0
-	for {
-		b, err := buf.Read(data)
-		totalSize = totalSize + int64(b)
+	data := make([]byte, 4000)
+
+	for err != io.EOF {
+		_, err := reader.Read(data)
 		if err == io.EOF {
-			logger.Log.Info("байтов", zap.Int64("всего", totalSize))
-			logger.Log.Info("Конец файла")
 			break
 		}
+		if err != nil && err != io.EOF {
+			return err
+		}
 		err = resp.Send(&pb.DownloadBinaryFileResponse{Content: data, Filename: meta.FileName})
-
 	}
-
+	logger.Log.Info("Закончили отправку")
 	return nil
+}
+
+func (s *Server) GetBinaryFileList(ctx context.Context, request *pb.BinaryFileListRequest) (*pb.BinaryFileListResponse, error) {
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	r, err := s.binaryManager.GetBinaryFiles(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*pb.BinaryFile, 0, len(r))
+	resp := pb.BinaryFileListResponse{}
+	for _, f := range r {
+		result = append(result, &pb.BinaryFile{Id: uint32(f.Id), Name: f.FileName, Description: f.Description})
+	}
+	resp.BinaryFiles = result
+	return &resp, nil
 }
 
 // Загружает текстовый файл произвольной длинны до 5 гигабайт
