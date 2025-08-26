@@ -20,6 +20,7 @@ type textStorager interface {
 	GetTextList(ctx context.Context, userId uint) ([]model.Text, error)
 	GetText(ctx context.Context, id uint) (model.Text, error)
 	UpdateText(ctx context.Context, id uint, content string, description string) error
+	DeleteText(ctx context.Context, id uint) error
 }
 
 func (f TextManager) UploadText(ctx context.Context, dto dto.Text) error {
@@ -48,4 +49,29 @@ func (c TextManager) UpdateText(ctx context.Context, userId uint, dto dto.Text) 
 		return internal_error.ErrorAccessDenied
 	}
 	return c.storager.UpdateText(ctx, userId, dto.Content, dto.Description)
+}
+
+// Удаление текстовый данных по Id
+func (c TextManager) DeleteText(ctx context.Context, userId uint, id uint) error {
+	text, err := c.storager.GetText(ctx, id)
+	if err != nil {
+		return err
+	}
+	if text.UserId != userId {
+		return internal_error.ErrorAccessDenied
+	}
+	err = c.storager.DeleteText(ctx, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Получение информации о текстовых данных по ID
+func (c TextManager) GetTextInfo(ctx context.Context, id uint) (dto.Text, error) {
+	text, err := c.storager.GetText(ctx, id)
+	if err != nil {
+		return dto.Text{}, err
+	}
+	return dto.Text{UserId: text.UserId, Content: text.Content, IsFile: text.IsFile, BinaryId: text.BinaryId, Description: text.Description}, nil
 }

@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s PgStorage) AddBinary(ctx context.Context, userId uint, description string, originalFileName string, externalFileName string) (uint, error) {
+func (s PgStorage) AddBinary(ctx context.Context, userId uint, description string, originalFileName string, externalFileName string) (model.Binary, error) {
 	db := s.db.WithContext(ctx)
 	db.Begin()
 	defer db.Commit()
@@ -22,9 +22,9 @@ func (s PgStorage) AddBinary(ctx context.Context, userId uint, description strin
 	r := db.Create(&model)
 	if r.Error != nil {
 		db.Rollback()
-		return 0, r.Error
+		return model, r.Error
 	}
-	return model.ID, nil
+	return model, nil
 }
 
 func (s PgStorage) AddTextFile(ctx context.Context, userId uint, description string, binaryId uint) error {
@@ -71,6 +71,15 @@ func (s PgStorage) UpdateBinary(ctx context.Context, id uint, externalName strin
 	r := s.db.Model(&model.Binary{}).Where("id = ?", id).Updates(model.Binary{ExternalFileName: externalName, OriginalFileName: originalName, Description: description})
 	if r.Error != nil {
 		return r.Error
+	}
+	return nil
+}
+
+// Удаление бинарных данных по Id
+func (s PgStorage) DeleteBinary(ctx context.Context, id uint) error {
+	result := s.db.WithContext(ctx).Delete(model.Binary{}, id)
+	if result.Error != nil {
+		return result.Error
 	}
 	return nil
 }

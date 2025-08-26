@@ -23,7 +23,7 @@ type Server struct {
 	creditCardManager creditCardManager
 	credManager       credentialsManager
 	textManager       textManager
-	//pb.UnimplementedKeeperServer
+	pb.UnimplementedKeeperServer
 }
 
 type FileStorager interface {
@@ -68,20 +68,21 @@ type storager interface {
 	userStorager
 	credentialsStorager
 	creditCardStorager
-	fileStorager
+	textStorager
 }
 
-type fileStorager interface {
-	AddText(ctx context.Context, userId uint, content string, description string) error
-	GetTextList(ctx context.Context, userId uint) ([]model.Text, error)
+type textStorager interface {
 	GetText(ctx context.Context, id uint) (model.Text, error)
+	GetTextList(ctx context.Context, userId uint) ([]model.Text, error)
+	UpdateText(ctx context.Context, id uint, content string, description string) error
+	DeleteText(ctx context.Context, id uint) error
 }
 
 type credentialsStorager interface {
 	AddCredentials(ctx context.Context, userId uint, login []byte, password []byte, description string) error
 	GetCredentials(ctx context.Context, userId uint) ([]model.Credentials, error)
 	DeleteCredentials(ctx context.Context, id uint) error
-	UpdateCredentials(ctx context.Context, id uint, login []byte, password []byte) error
+	UpdateCredentials(ctx context.Context, id uint, login []byte, password []byte, description string) error
 }
 
 type userStorager interface {

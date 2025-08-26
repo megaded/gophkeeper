@@ -27,6 +27,9 @@ func SaveLocalFile(reader io.Reader, fileName string) error {
 	}
 	defer file.Close()
 	_, err = io.Copy(file, reader)
+	if err == io.EOF {
+		return nil
+	}
 	if err != nil {
 		return err
 	}

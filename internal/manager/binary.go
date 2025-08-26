@@ -20,23 +20,22 @@ func NewBinaryManager(fileStorager fileStorager, storager fileMetaStorager) Bina
 	return BinaryManager{fileStorager: fileStorager, storager: storager}
 }
 
-func (b BinaryManager) uploadInternal(ctx context.Context, userId uint, dto dto.BinaryFile, reader io.Reader) (string, error) {
-	name, err := b.fileStorager.UploadFile(ctx, strconv.Itoa(int(userId)), dto.FileName, reader)
+func (b BinaryManager) uploadInternal(ctx context.Context, userId uint, dtos dto.BinaryFile, reader io.Reader) (dto.BinaryFile, error) {
+	name, err := b.fileStorager.UploadFile(ctx, strconv.Itoa(int(userId)), dtos.FileName, reader)
 	if err != nil {
-		return "", err
+		return dto.BinaryFile{}, err
 	}
-	_, err = b.storager.AddBinary(ctx, userId, dto.Description, dto.FileName, name)
+	new, err := b.storager.AddBinary(ctx, userId, dtos.Description, dtos.FileName, name)
 	if err != nil {
 		b.fileStorager.DeleteFile(ctx, userId, name)
-		return ",", err
+		return dto.BinaryFile{}, err
 	}
-	return name, nil
+	return dto.BinaryFile{Id: new.ID, UserId: new.ID, Description: new.Description, FileName: new.OriginalFileName, ExternalFileName: new.ExternalFileName}, nil
 }
 
 // Загрузка файла
-func (b BinaryManager) UploadFile(ctx context.Context, userId uint, dto dto.BinaryFile, reader io.Reader) error {
-	_, err := b.uploadInternal(ctx, userId, dto, reader)
-	return err
+func (b BinaryManager) UploadFile(ctx context.Context, userId uint, dto dto.BinaryFile, reader io.Reader) (dto.BinaryFile, error) {
+	return b.uploadInternal(ctx, userId, dto, reader)
 }
 
 // Загрузка текстового файла
@@ -45,12 +44,12 @@ func (b BinaryManager) UploadTextFile(ctx context.Context, userId uint, dto dto.
 	if err != nil {
 		return err
 	}
-	id, err := b.storager.AddBinary(ctx, userId, dto.Description, dto.FileName, name)
+	newFile, err := b.storager.AddBinary(ctx, userId, dto.Description, dto.FileName, name)
 	if err != nil {
 		b.fileStorager.DeleteFile(ctx, userId, name)
 		return err
 	}
-	err = b.storager.AddTextFile(ctx, userId, dto.Description, id)
+	err = b.storager.AddTextFile(ctx, userId, dto.Description, newFile.ID)
 	if err != nil {
 		b.fileStorager.DeleteFile(ctx, userId, name)
 		return err
@@ -97,11 +96,11 @@ func (b BinaryManager) UpdateBinaryFile(ctx context.Context, userId uint, dto dt
 	if fileInfo.UserId != userId {
 		return internal_error.ErrorAccessDenied
 	}
-	name, err := b.uploadInternal(ctx, userId, dto, reader)
+	newFile, err := b.uploadInternal(ctx, userId, dto, reader)
 	if err != nil {
 		return err
 	}
-	err = b.storager.UpdateBinary(ctx, dto.Id, name, dto.FileName, dto.Description)
+	err = b.storager.UpdateBinary(ctx, dto.Id, newFile.ExternalFileName, dto.FileName, dto.Description)
 	if err != nil {
 		return err
 	}
@@ -112,6 +111,7 @@ func (b BinaryManager) UpdateBinaryFile(ctx context.Context, userId uint, dto dt
 	return nil
 }
 
+// Удаляет бинарный файл по Id
 func (b BinaryManager) DeleteBinaryFile(ctx context.Context, userId uint, id uint) error {
 	fileInfo, err := b.storager.GetFileInfo(ctx, id)
 	if err != nil {
@@ -130,7 +130,7 @@ type fileStorager interface {
 }
 
 type fileMetaStorager interface {
-	AddBinary(ctx context.Context, userId uint, description string, originalFileName string, externalFileName string) (uint, error)
+	AddBinary(ctx context.Context, userId uint, description string, originalFileName string, externalFileName string) (model.Binary, error)
 	AddTextFile(ctx context.Context, userId uint, description string, binaryId uint) error
 	GetFileInfo(ctx context.Context, fileId uint) (model.Binary, error)
 	GetBinaryFiles(ctx context.Context, userId uint) ([]model.Binary, error)

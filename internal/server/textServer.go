@@ -99,7 +99,59 @@ func (s Server) UpdateTextFile(stream grpc.ClientStreamingServer[pb.UpdateTextFi
 	if err != nil {
 		return err
 	}
-	s.textManager.UpdateText(ctx, userId, dto.Text{Id: uint(req.Id), Description: req.Description, IsFile: true, bi})
+	err = s.textManager.UpdateText(ctx, userId, dto.Text{Id: uint(req.Id), Description: req.Description, IsFile: true, BinaryId: newFileInfo.Id})
+	if err != nil {
+		err = s.binaryManager.DeleteBinaryFile(ctx, userId, newFileInfo.Id)
+		return err
+	}
 
 	return stream.SendAndClose(&pb.UpdateTextFileResponse{})
+}
+
+func (s Server) UploadTextFile(stream grpc.ClientStreamingServer[pb.UploadTextFileRequest, pb.UploadTextFileResponse]) error {
+	ctx := stream.Context()
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return err
+	}
+	rd, wr := io.Pipe()
+	req, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	var totalSize int64 = int64(len(req.Content))
+	defer rd.Close()
+
+	go func() {
+		wr.Write(req.Content)
+		defer wr.Close()
+		for {
+			req, err := stream.Recv()
+			if err == io.EOF {
+				return
+			}
+			if err != nil {
+				wr.CloseWithError(err)
+				return
+			}
+			totalSize = totalSize + int64(len(req.Content))
+
+			wr.Write(req.Content)
+		}
+	}()
+
+	newFileInfo, err := s.binaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
+	if err != nil {
+		return err
+	}
+	err = s.textManager.UploadText(ctx, dto.Text{UserId: userId, IsFile: true, Description: req.Description, BinaryId: newFileInfo.Id})
+	if err != nil {
+		err = s.binaryManager.DeleteBinaryFile(ctx, userId, newFileInfo.Id)
+		if err != nil {
+			return err
+		}
+	}
+	return stream.SendAndClose(&pb.UploadTextFileResponse{})
+
 }

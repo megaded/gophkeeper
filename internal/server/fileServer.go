@@ -34,8 +34,6 @@ func (s *Server) UploadBinaryFile(stream grpc.ClientStreamingServer[pb.UploadBin
 		for {
 			req, err := stream.Recv()
 			if err == io.EOF {
-				logger.Log.Info("Пришло", zap.Int64("байт", totalSize))
-				logger.Log.Info("Выходим")
 				return
 			}
 			if err != nil {
@@ -48,11 +46,10 @@ func (s *Server) UploadBinaryFile(stream grpc.ClientStreamingServer[pb.UploadBin
 		}
 	}()
 
-	err = s.binaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
+	_, err = s.binaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
 	if err != nil {
 		return err
 	}
-	logger.Log.Info("Загрузили что-то")
 	return stream.SendAndClose(&pb.UploadBinaryFileResponse{})
 }
 
@@ -104,15 +101,6 @@ func (s *Server) GetBinaryFileList(ctx context.Context, request *pb.BinaryFileLi
 	}
 	resp.BinaryFiles = result
 	return &resp, nil
-}
-
-// Загружает текстовый файл произвольной длинны до 5 гигабайт
-// Пользователь определяется по переданому токену
-func (s Server) UploadTextFile(grpc.ClientStreamingServer[pb.UploadTextFileRequest, pb.UploadTextFileRequest]) error {
-	userId, err := getUserId(ctx)
-	if err != nil {
-		return nil, err
-	}
 }
 
 func (s Server) DeleteBinaryFile(ctx context.Context, req *pb.DeleteBinaryFileRequest) (*pb.DeleteBinaryFileResponse, error) {

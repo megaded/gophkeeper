@@ -40,12 +40,13 @@ func main_client() {
 
 func TestClient() {
 	client := proto.NewKeeperClient()
+	ctx := context.Background()
 
 	_, err := client.Login(context.Background(), "1234", "1234")
 	if err != nil {
 		logger.Log.Error(err.Error())
 	}
-	client.AddCreditCard(context.Background(), dto.Card{Number: "111111", Description: "Хуй", CVV: "1345", Exp: "2020"})
+	client.AddCreditCard(context.Background(), dto.Card{Number: "111111", Description: "Хуй", CVE: "1345", Exp: "2020"})
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -78,11 +79,10 @@ func TestClient() {
 		panic(err)
 	}
 	defer file.Close()
-	s, err := file.Stat()
 	if err != nil {
 		logger.Log.Error(err.Error())
 	}
-	err = client.UploadBinaryFile(file, s.Name(), "описание")
+	err = client.UploadBinaryFile(ctx, filePath, "описание")
 	if err != nil {
 		logger.Log.Error(err.Error())
 	}

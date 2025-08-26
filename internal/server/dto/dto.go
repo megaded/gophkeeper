@@ -17,10 +17,11 @@ type Card struct {
 }
 
 type BinaryFile struct {
-	Id          uint
-	UserId      uint
-	FileName    string
-	Description string
+	Id               uint
+	UserId           uint
+	FileName         string
+	ExternalFileName string
+	Description      string
 }
 
 type Text struct {
@@ -29,4 +30,5 @@ type Text struct {
 	Description string
 	Content     string
 	IsFile      bool
+	BinaryId    uint
 }
