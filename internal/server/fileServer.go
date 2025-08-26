@@ -78,6 +78,9 @@ func (s *Server) DownloadBinaryFile(req *pb.DownloadBinaryFileRequest, resp grpc
 			return err
 		}
 		err = resp.Send(&pb.DownloadBinaryFileResponse{Content: data, Filename: meta.FileName})
+		if err != nil {
+			return err
+		}
 	}
 	logger.Log.Info("Закончили отправку")
 	return nil

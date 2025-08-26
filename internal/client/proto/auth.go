@@ -27,10 +27,10 @@ func (c *keeperClient) Register(ctx context.Context, login string, password stri
 	return err
 }
 
-func getCtx(token string) (context.Context, error) {
+func getCtx(ctx context.Context, token string) (context.Context, error) {
 	if token == "" {
 		return nil, errors.New("Token is empty")
 	}
 	md := metadata.New(map[string]string{"token": token})
-	return metadata.NewOutgoingContext(context.Background(), md), nil
+	return metadata.NewOutgoingContext(ctx, md), nil
 }

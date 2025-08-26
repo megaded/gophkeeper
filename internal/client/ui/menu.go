@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -20,13 +21,18 @@ const (
 )
 
 var (
-	dictDataTypeRender = map[dataType]func(KeeperClient) tea.Model{
-		card:   func(kc KeeperClient) tea.Model { return NewCreditCardListModel(kc) },
-		binary: func(kc KeeperClient) tea.Model { return NewUploadFileModel(kc) },
+	dictDataTypeRender = map[dataType]func(ctx context.Context, kc KeeperClient, back tea.Model) tea.Model{
+		card: func(ctx context.Context, kc KeeperClient, back tea.Model) tea.Model {
+			return NewCreditCardListModel(ctx, kc, back)
+		},
+		binary: func(ctx context.Context, kc KeeperClient, back tea.Model) tea.Model {
+			return NewUploadFileModel(ctx, kc, back)
+		},
+		cred: func(ctx context.Context, kc KeeperClient, back tea.Model) tea.Model {
+			return NewCredentialListModel(ctx, kc, back)
+		},
 	}
 )
-
-const listHeight = 14
 
 var (
 	titleStyle        = lipgloss.NewStyle().MarginLeft(2)

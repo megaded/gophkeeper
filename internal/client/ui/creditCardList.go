@@ -25,6 +25,9 @@ func (i creditCard) FilterValue() string { return i.number }
 type creditCardListModel struct {
 	list   list.Model
 	client KeeperClient
+	ctx    context.Context
+	back   tea.Model
+	err    error
 }
 
 func (m creditCardListModel) Init() tea.Cmd {
@@ -40,8 +43,19 @@ func (m creditCardListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.Type == tea.KeyEnter {
 			card, ok := m.list.SelectedItem().(creditCard)
 			if ok {
-
 				return InitialCreditCardEditModel(m.client, card.number, card.exp, card.cvv), nil
+			}
+		}
+		if msg.Type == tea.KeyCtrlD {
+			card, ok := m.list.SelectedItem().(creditCard)
+			if ok {
+				err := m.client.DeleteCreditCard(m.ctx, card.id)
+				if err != nil {
+					var cmd tea.Cmd
+					m.list, cmd = m.list.Update(msg)
+					return m, cmd
+				}
+				return NewCreditCardListModel(m.ctx, m.client, m.back), nil
 			}
 		}
 	case tea.WindowSizeMsg:
@@ -58,7 +72,7 @@ func (m creditCardListModel) View() string {
 	return docStyle.Render(m.list.View())
 }
 
-func NewCreditCardListModel(client KeeperClient) creditCardListModel {
+func NewCreditCardListModel(ctx context.Context, client KeeperClient, back tea.Model) creditCardListModel {
 	cards, err := client.GetCreditCards(context.TODO())
 	if err != nil {
 		m := creditCardListModel{list: list.New(nil, list.NewDefaultDelegate(), 0, 0)}
@@ -68,10 +82,11 @@ func NewCreditCardListModel(client KeeperClient) creditCardListModel {
 
 	items := make([]list.Item, 0, len(cards))
 	for _, k := range cards {
-		items = append(items, creditCard{number: k.Number, exp: k.Exp, description: k.Description, cvv: k.CVV, id: k.Id})
+		items = append(items, creditCard{number: k.Number, exp: k.Exp, description: k.Description, cvv: k.CVE, id: k.Id})
 	}
 	m := creditCardListModel{client: client, list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.list.Title = "Список карт"
-
+	m.back = back
+	m.ctx = ctx
 	return m
 }

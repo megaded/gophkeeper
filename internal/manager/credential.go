@@ -64,10 +64,30 @@ func (c CredentialsManager) DeleteCredential(ctx context.Context, userId uint, i
 	return err
 }
 
+// Обновление данных логин\пароль
+func (c CredentialsManager) UpdateCredentials(ctx context.Context, userId uint, dto dto.Credentials) error {
+	cred, err := c.storage.GetCredential(ctx, dto.Id)
+	if err != nil {
+		return err
+	}
+	if cred.UserId != userId {
+		return internal_error.ErrorAccessDenied
+	}
+	login, err := c.cryptoManager.Encrypt(dto.Login)
+	if err != nil {
+		return err
+	}
+	password, err := c.cryptoManager.Encrypt(dto.Password)
+	if err != nil {
+		return err
+	}
+	return c.storage.UpdateCredentials(ctx, userId, login, password, cred.Description)
+}
+
 type credentialsStorager interface {
 	AddCredentials(ctx context.Context, userId uint, login []byte, password []byte, description string) error
 	GetCredentials(ctx context.Context, userId uint) ([]model.Credentials, error)
-	GetCredential(ctx context.Context, userId uint) (model.Credentials, error)
+	GetCredential(ctx context.Context, id uint) (model.Credentials, error)
 	DeleteCredentials(ctx context.Context, id uint) error
-	UpdateCredentials(ctx context.Context, cred dto.Credentials) error
+	UpdateCredentials(ctx context.Context, id uint, login []byte, password []byte, description string) error
 }

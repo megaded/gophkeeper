@@ -156,7 +156,7 @@ func (m creditCardModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.focused == len(m.inputs) {
-				err := m.client.AddCreditCard(context.Background(), dto.Card{Number: m.inputs[ccn].Value(), Exp: m.inputs[exp].Value(), CVV: m.inputs[cvv].Value()})
+				err := m.client.AddCreditCard(context.Background(), dto.Card{Number: m.inputs[ccn].Value(), Exp: m.inputs[exp].Value(), CVE: m.inputs[cvv].Value()})
 				if err != nil {
 					fmt.Println(err.Error())
 					return m, tea.Quit
@@ -164,7 +164,7 @@ func (m creditCardModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return NewDataMenu(m.client), tea.Quit
 			}
 			m.focused++
-		case tea.KeyCtrlC, tea.KeyEsc:
+		case tea.KeyCtrlC:
 			return m, tea.Quit
 		case tea.KeyShiftTab, tea.KeyCtrlP:
 			m.prevInput()

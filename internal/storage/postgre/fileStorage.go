@@ -65,3 +65,12 @@ func (s PgStorage) GetBinaryFiles(ctx context.Context, userId uint) ([]model.Bin
 		return model, result.Error
 	}
 }
+
+// Обновляет бинарный файл
+func (s PgStorage) UpdateBinary(ctx context.Context, id uint, externalName string, originalName string, description string) error {
+	r := s.db.Model(&model.Binary{}).Where("id = ?", id).Updates(model.Binary{ExternalFileName: externalName, OriginalFileName: originalName, Description: description})
+	if r.Error != nil {
+		return r.Error
+	}
+	return nil
+}

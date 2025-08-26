@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -17,9 +18,11 @@ type uploadFile struct {
 	err           error
 	client        KeeperClient
 	successUpload bool
+	ctx           context.Context
+	back          tea.Model
 }
 
-func NewUploadFileModel(client KeeperClient) uploadFile {
+func NewUploadFileModel(ctx context.Context, client KeeperClient, back tea.Model) uploadFile {
 	ti := textinput.New()
 	ti.Placeholder = "Введи путь файла"
 	ti.Focus()
@@ -31,6 +34,8 @@ func NewUploadFileModel(client KeeperClient) uploadFile {
 		err:           nil,
 		client:        client,
 		successUpload: false,
+		ctx:           ctx,
+		back:          back,
 	}
 }
 

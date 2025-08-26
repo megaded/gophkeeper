@@ -8,44 +8,42 @@ type User struct {
 	Hash string
 }
 
-type FileInfo struct {
+type Credentials struct {
+	gorm.Model
+	UserId      uint
+	User        User
+	Description string
+	Login       []byte
+	Password    []byte
+}
+
+type CreditCard struct {
+	gorm.Model
+	UserId      uint
+	User        User
+	Description string
+	Number      []byte
+	Ext         []byte
+	CVE         []byte
+}
+
+type Binary struct {
+	gorm.Model
+	UserId           uint
+	User             User
+	Description      string
 	OriginalFileName string
 	ExternalFileName string
 	BuckerName       string
 }
 
-type KeeperInfo struct {
+type Text struct {
+	gorm.Model
 	UserId      uint
 	User        User
 	Description string
-}
-
-type Credentials struct {
-	gorm.Model
-	KeeperInfo
-	Login    []byte
-	Password []byte
-}
-
-type CreditCard struct {
-	gorm.Model
-	KeeperInfo
-	Number []byte
-	Ext    []byte
-	CVE    []byte
-}
-
-type Binary struct {
-	KeeperInfo
-	gorm.Model
-	FileInfo
-}
-
-type Text struct {
-	KeeperInfo
-	gorm.Model
-	Content  string
-	BinaryId uint
-	Binary   Binary
-	IsFile   bool
+	Content     string
+	BinaryId    uint
+	Binary      Binary
+	IsFile      bool
 }

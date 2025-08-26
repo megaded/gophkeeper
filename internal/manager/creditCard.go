@@ -30,7 +30,7 @@ func (c CreditCardManager) AddCreditCard(ctx context.Context, userId uint, dto d
 	if err != nil {
 		return err
 	}
-	cvv, err := c.cryptoManager.Encrypt(dto.CVV)
+	cvv, err := c.cryptoManager.Encrypt(dto.CVE)
 	if err != nil {
 		return err
 	}
@@ -60,9 +60,32 @@ func (c CreditCardManager) GetCreditCards(ctx context.Context, userId uint) ([]d
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, dto.Card{Number: number, Exp: exp, CVV: cvv, Description: card.Description})
+		result = append(result, dto.Card{Number: number, Exp: exp, CVE: cvv, Description: card.Description})
 	}
 	return result, nil
+}
+
+func (c CreditCardManager) UpdateCreditCard(ctx context.Context, userId uint, dto dto.Card) error {
+	card, err := c.storager.GetCreditCard(ctx, dto.Id)
+	if err != nil {
+		return err
+	}
+	if card.UserId != userId {
+		return internal_error.ErrorAccessDenied
+	}
+	number, err := c.cryptoManager.Encrypt(dto.Number)
+	if err != nil {
+		return err
+	}
+	cve, err := c.cryptoManager.Encrypt(dto.CVE)
+	if err != nil {
+		return err
+	}
+	exp, err := c.cryptoManager.Encrypt(dto.Exp)
+	if err != nil {
+		return err
+	}
+	return c.storager.UpdateCreditCard(ctx, dto.Id, number, exp, cve, dto.Description)
 }
 
 type creditCardStorager interface {
@@ -70,6 +93,7 @@ type creditCardStorager interface {
 	GetCreditCards(ctx context.Context, userId uint) ([]model.CreditCard, error)
 	GetCreditCard(ctx context.Context, id uint) (model.CreditCard, error)
 	DeleteCreditCard(ctx context.Context, id uint) error
+	UpdateCreditCard(ctx context.Context, id uint, cvv []byte, exp []byte, cve []byte, description string) error
 }
 
 func NewCreditCardManager(cfg config.Config, storager creditCardStorager) CreditCardManager {

@@ -23,12 +23,15 @@ type registerModel struct {
 	client     KeeperClient
 	err        *error
 	success    bool
+	ctx        context.Context
+	back       tea.Model
 }
 
-func InitialRegisterModel(client KeeperClient) registerModel {
+func InitialRegisterModel(client KeeperClient, back tea.Model) registerModel {
 	m := registerModel{
 		client: client,
 		inputs: make([]textinput.Model, 2),
+		back:   back,
 	}
 
 	var t textinput.Model
@@ -72,7 +75,7 @@ func (m registerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case tea.KeyEnter:
 			if m.focusIndex == 2 {
-				err := m.client.Register(context.TODO(), m.login, m.password)
+				err := m.client.Register(m.ctx, m.login, m.password)
 				if err != nil {
 					m.err = &err
 				}

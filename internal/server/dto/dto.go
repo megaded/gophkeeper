@@ -12,7 +12,7 @@ type Card struct {
 	Id          uint
 	Number      string
 	Exp         string
-	CVV         string
+	CVE         string
 	Description string
 }
 

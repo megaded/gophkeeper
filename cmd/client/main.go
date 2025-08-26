@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"gophkeeper/internal/client/ui"
 	"gophkeeper/internal/logger"
 	"os"
+	"os/signal"
+	"syscall"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -73,7 +76,14 @@ func main() {
 	   		logger.Log.Error(err.Error())
 	   	} */
 
-	if _, err := tea.NewProgram(ui.InitialMainModel()).Run(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+		<-sigChan
+		cancel()
+	}()
+	if _, err := tea.NewProgram(ui.InitialMainModel(ctx)).Run(); err != nil {
 		fmt.Printf("could not start program: %s\n", err)
 		os.Exit(1)
 	}

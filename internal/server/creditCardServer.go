@@ -20,7 +20,7 @@ func (s *Server) GetCreditCardList(ctx context.Context, req *pb.CreditCardReques
 	resp := pb.CreditCardListResponse{}
 	resp.CreditCards = make([]*pb.CreditCard, 0, len(cards))
 	for _, k := range cards {
-		resp.CreditCards = append(resp.CreditCards, &pb.CreditCard{Number: k.Number, Description: k.Description, Cvv: k.CVV, Exp: k.Exp})
+		resp.CreditCards = append(resp.CreditCards, &pb.CreditCard{Number: k.Number, Description: k.Description, Cvv: k.CVE, Exp: k.Exp})
 	}
 	return &resp, err
 }
@@ -46,7 +46,7 @@ func (s *Server) AddCreditCard(ctx context.Context, req *pb.AddCreditCardRequest
 	if err != nil {
 		return nil, err
 	}
-	err = s.creditCardManager.AddCreditCard(ctx, userId, dto.Card{Number: req.Number, CVV: req.Cvv, Exp: req.Exp, Description: req.Description})
+	err = s.creditCardManager.AddCreditCard(ctx, userId, dto.Card{Number: req.Number, CVE: req.Cvv, Exp: req.Exp, Description: req.Description})
 	if err != nil {
 		return nil, err
 	}

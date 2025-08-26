@@ -62,3 +62,12 @@ func (s PgStorage) AddCreditCard(ctx context.Context, userId uint, number []byte
 	}
 	return nil
 }
+
+// Обновляет данные типа логин\пароль
+func (s PgStorage) UpdateCreditCard(ctx context.Context, id uint, cvv []byte, exp []byte, cve []byte, description string) error {
+	r := s.db.Model(&model.CreditCard{}).Where("id = ?", id).Updates(model.CreditCard{Number: cvv, Ext: exp, CVE: cve, Description: description})
+	if r.Error != nil {
+		return r.Error
+	}
+	return nil
+}

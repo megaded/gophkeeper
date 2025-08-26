@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"gophkeeper/internal/internal_error"
-	"gophkeeper/internal/server/dto"
 	"gophkeeper/internal/storage/model"
 
 	"gorm.io/gorm"
@@ -63,6 +62,10 @@ func (s PgStorage) DeleteCredentials(ctx context.Context, id uint) error {
 }
 
 // Обновляет данные типа логин\пароль
-func (s PgStorage) UpdateCredentials(ctx context.Context, cred dto.Credentials) error {
+func (s PgStorage) UpdateCredentials(ctx context.Context, id uint, login []byte, password []byte, description string) error {
+	r := s.db.Model(&model.Credentials{}).Where("id = ?", id).Updates(model.Credentials{Login: login, Password: password, Description: description})
+	if r.Error != nil {
+		return r.Error
+	}
 	return nil
 }

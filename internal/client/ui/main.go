@@ -12,11 +12,17 @@ import (
 var (
 	login    = "login"
 	register = "register"
+	credList = "credList"
+	credForm = "cred"
+	cardList = "cardList"
+	cardForm = "cardForm"
+	textList = "textForm"
 )
 
 type mainModel struct {
 	componentMap map[string]tea.Model
 	currentModel tea.Model
+	ctx          context.Context
 }
 
 type KeeperClient interface {
@@ -34,29 +40,37 @@ type AuthKeeperClient interface {
 type CreditCardKeeperClient interface {
 	AddCreditCard(ctx context.Context, dto dto.Card) error
 	GetCreditCards(ctx context.Context) ([]dto.Card, error)
+	DeleteCreditCard(ctx context.Context, id uint) error
+	UpdateCreditCard(ctx context.Context, dto dto.Card) error
 }
 
 type CredentialsKeeperClient interface {
 	AddCredentials(ctx context.Context, cred dto.Credentials) error
 	GetCredentials(ctx context.Context) ([]dto.Credentials, error)
+	DeleteCreditial(ctx context.Context, id uint) error
+	UpdateCreditial(ctx context.Context, dto dto.Credentials) error
 }
 
 type BinaryKeeperClient interface {
-	UploadBinaryFile(filePath string, description string) error
+	UploadBinaryFile(ctx context.Context, filePath string, description string) error
 	DownloadBinaryFile(ctx context.Context, id uint) error
 	GetBinaryFileList(ctx context.Context) ([]dto.BinaryFile, error)
+	UpdateBinaryFile(ctx context.Context, filePath string, description string, id uint) error
+	DeleteBinaryFile(ctx context.Context, id uint) error
 }
 
 type TextKeeperClient interface {
-	UploadTextFile(reader io.Reader, fileName string, description string, size int64) error
-	UploadText(reader io.Reader, fileName string, description string, size int64) error
-	GetTextList() ([]dto.Text, error)
+	UploadTextFile(ctx context.Context, reader io.Reader, fileName string, description string, size int64) error
+	UploadText(ctx context.Context, reader io.Reader, fileName string, description string, size int64) error
+	GetTextList(ctx context.Context) ([]dto.Text, error)
+	DeleteText(ctx context.Context, id uint) error
+	UpdateText(ctx context.Context, dto dto.Text) error
 }
 
-func InitialMainModel() mainModel {
+func InitialMainModel(ctx context.Context) mainModel {
 	client := proto.NewKeeperClient()
 	loginModel := InitialLoginModel(client)
-	registerModel := InitialRegisterModel(client)
+	registerModel := InitialRegisterModel(client, loginModel)
 	componentMap := make(map[string]tea.Model)
 	componentMap[login] = loginModel
 	componentMap[register] = registerModel

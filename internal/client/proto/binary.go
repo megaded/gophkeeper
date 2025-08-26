@@ -10,8 +10,8 @@ import (
 	"os"
 )
 
-func (c *keeperClient) UploadBinaryFile(filePath string, description string) error {
-	ctx, err := getCtx(c.token)
+func (c *keeperClient) UploadBinaryFile(ctx context.Context, filePath string, description string) error {
+	ctx, err := getCtx(ctx, c.token)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func (c *keeperClient) UploadBinaryFile(filePath string, description string) err
 }
 
 func (c *keeperClient) DownloadBinaryFile(ctx context.Context, id uint) error {
-	ctx, err := getCtx(c.token)
+	ctx, err := getCtx(ctx, c.token)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (c *keeperClient) DownloadBinaryFile(ctx context.Context, id uint) error {
 }
 
 func (c keeperClient) GetBinaryFileList(ctx context.Context) ([]dto.BinaryFile, error) {
-	ctx, err := getCtx(c.token)
+	ctx, err := getCtx(ctx, c.token)
 	if err != nil {
 		return nil, err
 	}
@@ -106,4 +106,55 @@ func (c keeperClient) GetBinaryFileList(ctx context.Context) ([]dto.BinaryFile, 
 		result = append(result, dto.BinaryFile{FileName: f.Name, Description: f.Description, Id: uint(f.Id)})
 	}
 	return result, nil
+}
+
+func (c keeperClient) DeleteBinaryFile(ctx context.Context, id uint) error {
+	ctx, err := getCtx(ctx, c.token)
+	if err != nil {
+		return err
+	}
+	_, err = c.client.DeleteBinaryFile(ctx, &pb.DeleteBinaryFileRequest{Id: uint32(id)})
+	return err
+}
+
+func (c keeperClient) UpdateBinaryFile(ctx context.Context, filePath string, description string, id uint) error {
+	ctx, err := getCtx(ctx, c.token)
+	if err != nil {
+		return err
+	}
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	fStat, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	fileName := fStat.Name()
+	k, err := c.client.UpdateBinaryFile(ctx)
+	if err != nil {
+		return err
+	}
+
+	buf := bufio.NewReader(file)
+	data := make([]byte, buf.Size())
+	var totalSize int64 = 0
+	for err != io.EOF {
+		b, err := buf.Read(data)
+		totalSize = totalSize + int64(b)
+		if err == io.EOF {
+			break
+		}
+		err = k.Send(&pb.UpdateBinaryFileRequest{Content: data, Filename: fileName, Description: description, Id: uint32(id)})
+		if err != nil && err != io.EOF {
+			_, err = k.CloseAndRecv()
+			return err
+		}
+	}
+	_, err = k.CloseAndRecv()
+	if err != nil && err != io.EOF {
+		return err
+	}
+	return nil
 }

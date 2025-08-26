@@ -81,8 +81,14 @@ func (m *MinioStorage) DownloadFile(ctx context.Context, userId uint, fileName s
 }
 
 // Удаление
-func (m MinioStorage) DeleteFile(ctx context.Context, userId uint, name string) {
-	panic(" MinioStorage DeleteFile")
+func (m MinioStorage) DeleteFile(ctx context.Context, userId uint, name string) error {
+	userIdStr := strconv.Itoa(int(userId))
+	err := m.client.RemoveObject(ctx, getBucketName(userIdStr), name, minio.RemoveObjectOptions{})
+	if err != nil {
+		logger.Log.Error("Невозможно удалить файл", zap.Error(err))
+		return err
+	}
+	return nil
 }
 
 func getBucketName(userId string) string {

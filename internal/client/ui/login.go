@@ -37,6 +37,7 @@ type loginModel struct {
 	token      string
 	client     KeeperClient
 	err        error
+	ctx        context.Context
 }
 
 func InitialLoginModel(client KeeperClient) loginModel {
@@ -83,12 +84,12 @@ func (m loginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case tea.KeyCtrlR:
 
-			return InitialRegisterModel(m.client), nil
+			return InitialRegisterModel(m.client, m), nil
 
 		case tea.KeyEnter:
 			s := msg.String()
 			if s == "enter" && m.focusIndex == len(m.inputs) {
-				r, err := m.client.Login(context.Background(), m.login, m.password)
+				r, err := m.client.Login(m.ctx, m.login, m.password)
 				if err != nil {
 					m.err = err
 					return m, nil
