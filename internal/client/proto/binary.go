@@ -32,10 +32,8 @@ func (c *keeperClient) UploadBinaryFile(ctx context.Context, filePath string, de
 
 	buf := bufio.NewReader(file)
 	data := make([]byte, buf.Size())
-	var totalSize int64 = 0
 	for err != io.EOF {
-		b, err := buf.Read(data)
-		totalSize = totalSize + int64(b)
+		_, err := buf.Read(data)
 		if err == io.EOF {
 			break
 		}
@@ -66,11 +64,10 @@ func (c *keeperClient) DownloadBinaryFile(ctx context.Context, id uint) error {
 	if err != nil {
 		return err
 	}
-
+	defer rd.Close()
 	fineName := resp.Filename
 	go func() {
 		defer wr.Close()
-
 		wr.Write(resp.Content)
 		for {
 			resp, err := r.Recv()

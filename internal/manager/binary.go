@@ -7,6 +7,8 @@ import (
 	"gophkeeper/internal/server/dto"
 	"gophkeeper/internal/storage/model"
 	"io"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -70,6 +72,7 @@ func (b BinaryManager) DownloadFile(ctx context.Context, userId uint, id uint) (
 	if err != nil {
 		return nil, dto.BinaryFile{}, err
 	}
+	//SaveLocalFile(r, fileInfo.OriginalFileName)
 	return r, dto.BinaryFile{Id: fileInfo.ID, FileName: fileInfo.OriginalFileName}, nil
 
 }
@@ -119,6 +122,34 @@ func (b BinaryManager) DeleteBinaryFile(ctx context.Context, userId uint, id uin
 	}
 	if fileInfo.UserId != userId {
 		return internal_error.ErrorAccessDenied
+	}
+	return nil
+}
+
+func SaveLocalFile(reader io.Reader, fileName string) error {
+	rootDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	downloadDir := filepath.Join(rootDir, "Download")
+	_, err = os.Stat(downloadDir)
+	if os.IsNotExist(err) {
+		err = os.Mkdir(downloadDir, os.ModeAppend)
+		if err != nil {
+			return err
+		}
+	}
+	file, err := os.Create(filepath.Join(downloadDir, fileName))
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+	_, err = io.Copy(file, reader)
+	if err == io.EOF {
+		return nil
+	}
+	if err != nil {
+		return err
 	}
 	return nil
 }

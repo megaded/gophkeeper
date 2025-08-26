@@ -65,22 +65,28 @@ func (s *Server) DownloadBinaryFile(req *pb.DownloadBinaryFileRequest, resp grpc
 	if err != nil {
 		return err
 	}
-	data := make([]byte, 4000)
 
-	for err != io.EOF {
-		_, err := reader.Read(data)
-		if err == io.EOF {
-			break
+	bufferSize := int64(10 * 1024)
+	buffer := make([]byte, bufferSize)
+
+	for {
+
+		n, err := reader.Read(buffer)
+		if n > 0 {
+
+			sendErr := resp.Send(&pb.DownloadBinaryFileResponse{Content: buffer, Filename: meta.FileName})
+			if sendErr != nil {
+				return sendErr
+			}
 		}
-		if err != nil && err != io.EOF {
-			return err
-		}
-		err = resp.Send(&pb.DownloadBinaryFileResponse{Content: data, Filename: meta.FileName})
 		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
 			return err
 		}
 	}
-	logger.Log.Info("Закончили отправку")
 	return nil
 }
 
