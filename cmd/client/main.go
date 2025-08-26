@@ -9,6 +9,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+var (
+	Version string
+	Time    string
+)
+
 func main() {
 	logger.SetupLogger("info")
 	/* client := proto.NewKeeperClient() */

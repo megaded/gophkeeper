@@ -7,6 +7,7 @@ import (
 	"errors"
 	"gophkeeper/internal/config"
 	"gophkeeper/internal/logger"
+	"gophkeeper/internal/meta"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -23,9 +24,9 @@ func CreateIdentityProvider(c *config.Config) IdentityProvider {
 
 func (id *IdentityProvider) GenerateToken(userID int) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userID,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(),
-		"iat":     time.Now().Unix(),
+		meta.UserId: userID,
+		"exp":       time.Now().Add(24 * time.Hour).Unix(),
+		"iat":       time.Now().Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(id.key))
@@ -46,7 +47,7 @@ func (id *IdentityProvider) ParseToken(tokenStr string) (int, error) {
 		return 0, errors.New("invalid claims")
 	}
 
-	userIDFloat, ok := claims["user_id"].(float64)
+	userIDFloat, ok := claims[meta.UserId].(float64)
 	if !ok {
 		return 0, errors.New("user_id not found")
 	}

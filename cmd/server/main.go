@@ -14,6 +14,11 @@ import (
 	"syscall"
 )
 
+var (
+	Version string
+	Time    string
+)
+
 func main() {
 	logger.SetupLogger("Info")
 	cfg := config.GetConfig()
