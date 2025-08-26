@@ -23,7 +23,7 @@ type Server struct {
 	creditCardManager creditCardManager
 	credManager       credentialsManager
 	textManager       textManager
-	pb.UnimplementedKeeperServer
+	//pb.UnimplementedKeeperServer
 }
 
 type FileStorager interface {
@@ -101,7 +101,7 @@ type userManager interface {
 }
 
 type binaryManager interface {
-	UploadFile(ctx context.Context, userId uint, dto dto.BinaryFile, reader io.Reader) error
+	UploadFile(ctx context.Context, userId uint, dto dto.BinaryFile, reader io.Reader) (dto.BinaryFile, error)
 	DownloadFile(ctx context.Context, userId uint, id uint) (reader io.Reader, info dto.BinaryFile, err error)
 	GetBinaryFiles(ctx context.Context, userId uint) ([]dto.BinaryFile, error)
 	UpdateBinaryFile(ctx context.Context, userId uint, dto dto.BinaryFile, reader io.Reader) error
@@ -124,6 +124,7 @@ type credentialsManager interface {
 type textManager interface {
 	UploadText(ctx context.Context, dto dto.Text) error
 	GetTextList(ctx context.Context, userId uint) ([]dto.Text, error)
+	GetTextInfo(ctx context.Context, id uint) (dto.Text, error)
 	UpdateText(ctx context.Context, userId uint, dto dto.Text) error
 	DeleteText(ctx context.Context, userId uint, id uint) error
 }

@@ -22,7 +22,7 @@ type uploadFile struct {
 	back          tea.Model
 }
 
-func NewUploadFileModel(ctx context.Context, client KeeperClient, back tea.Model) uploadFile {
+func NewUploadFileModel(ctx context.Context, client KeeperClient) uploadFile {
 	ti := textinput.New()
 	ti.Placeholder = "Введи путь файла"
 	ti.Focus()
@@ -35,7 +35,7 @@ func NewUploadFileModel(ctx context.Context, client KeeperClient, back tea.Model
 		client:        client,
 		successUpload: false,
 		ctx:           ctx,
-		back:          back,
+		back:          NewDataMenu(ctx, client),
 	}
 }
 
@@ -50,7 +50,7 @@ func (m uploadFile) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEnter:
-			err := m.client.UploadBinaryFile(m.textInput.Value(), "описание")
+			err := m.client.UploadBinaryFile(m.ctx, m.textInput.Value(), "описание")
 			if err != nil {
 				m.successUpload = false
 				m.err = err

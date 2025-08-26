@@ -40,8 +40,9 @@ type loginModel struct {
 	ctx        context.Context
 }
 
-func InitialLoginModel(client KeeperClient) loginModel {
+func InitialLoginModel(ctx context.Context, client KeeperClient) loginModel {
 	m := loginModel{
+		ctx:    ctx,
 		client: client,
 		inputs: make([]textinput.Model, 2),
 	}
@@ -84,7 +85,7 @@ func (m loginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case tea.KeyCtrlR:
 
-			return InitialRegisterModel(m.client, m), nil
+			return InitialRegisterModel(m.ctx, m.client), nil
 
 		case tea.KeyEnter:
 			s := msg.String()
@@ -95,7 +96,7 @@ func (m loginModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 				m.token = r
-				return NewDataMenu(m.client), nil
+				return NewDataMenu(m.ctx, m.client), nil
 			}
 			currentInput := m.inputs[m.focusIndex]
 			if loginInput == m.focusIndex {

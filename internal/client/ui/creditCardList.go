@@ -55,7 +55,7 @@ func (m creditCardListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.list, cmd = m.list.Update(msg)
 					return m, cmd
 				}
-				return NewCreditCardListModel(m.ctx, m.client, m.back), nil
+				return NewCreditCardListModel(m.ctx, m.client), nil
 			}
 		}
 	case tea.WindowSizeMsg:
@@ -72,7 +72,7 @@ func (m creditCardListModel) View() string {
 	return docStyle.Render(m.list.View())
 }
 
-func NewCreditCardListModel(ctx context.Context, client KeeperClient, back tea.Model) creditCardListModel {
+func NewCreditCardListModel(ctx context.Context, client KeeperClient) creditCardListModel {
 	cards, err := client.GetCreditCards(context.TODO())
 	if err != nil {
 		m := creditCardListModel{list: list.New(nil, list.NewDefaultDelegate(), 0, 0)}
@@ -82,11 +82,11 @@ func NewCreditCardListModel(ctx context.Context, client KeeperClient, back tea.M
 
 	items := make([]list.Item, 0, len(cards))
 	for _, k := range cards {
-		items = append(items, creditCard{number: k.Number, exp: k.Exp, description: k.Description, cvv: k.CVE, id: k.Id})
+		items = append(items, creditCard{number: k.Number, exp: k.Exp, description: k.Description, cvv: k.CVV, id: k.Id})
 	}
 	m := creditCardListModel{client: client, list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.list.Title = "Список карт"
-	m.back = back
+	m.back = NewDataMenu(ctx, client)
 	m.ctx = ctx
 	return m
 }

@@ -52,3 +52,16 @@ func (s *Server) AddCreditCard(ctx context.Context, req *pb.AddCreditCardRequest
 	}
 	return &pb.AddCreditCardResponse{}, nil
 }
+
+// Обновление информации о банковской карте
+func (s Server) UpdateCreditCard(ctx context.Context, req *pb.UpdateCreditCardRequest) (*pb.UpdateCreditCardResponse, error) {
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = s.creditCardManager.UpdateCreditCard(ctx, userId, dto.Card{Number: req.Card.Number, Exp: req.Card.Exp, CVE: req.Card.Cvv, Description: req.Card.Description})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UpdateCreditCardResponse{}, nil
+}

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.31.1
-// source: proto/keeper.proto
+// source: keeper.proto
 
 package keeper
 
@@ -62,7 +62,7 @@ type KeeperClient interface {
 	UploadText(ctx context.Context, in *UploadTextRequest, opts ...grpc.CallOption) (*UploadTextResponse, error)
 	DeleteText(ctx context.Context, in *DeleteTextRequest, opts ...grpc.CallOption) (*DeleteTextResponse, error)
 	UpdateText(ctx context.Context, in *UpdateTextRequest, opts ...grpc.CallOption) (*UpdateTextResponse, error)
-	UpdateTextFile(ctx context.Context, in *UpdateTextFileRequest, opts ...grpc.CallOption) (*UpdateTextFileResponse, error)
+	UpdateTextFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UpdateTextFileRequest, UpdateTextFileResponse], error)
 	AddCreditCard(ctx context.Context, in *AddCreditCardRequest, opts ...grpc.CallOption) (*AddCreditCardResponse, error)
 	GetCreditCardList(ctx context.Context, in *CreditCardRequest, opts ...grpc.CallOption) (*CreditCardListResponse, error)
 	UpdateCreditCard(ctx context.Context, in *UpdateCreditCardRequest, opts ...grpc.CallOption) (*UpdateCreditCardResponse, error)
@@ -255,15 +255,18 @@ func (c *keeperClient) UpdateText(ctx context.Context, in *UpdateTextRequest, op
 	return out, nil
 }
 
-func (c *keeperClient) UpdateTextFile(ctx context.Context, in *UpdateTextFileRequest, opts ...grpc.CallOption) (*UpdateTextFileResponse, error) {
+func (c *keeperClient) UpdateTextFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UpdateTextFileRequest, UpdateTextFileResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateTextFileResponse)
-	err := c.cc.Invoke(ctx, Keeper_UpdateTextFile_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &Keeper_ServiceDesc.Streams[4], Keeper_UpdateTextFile_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[UpdateTextFileRequest, UpdateTextFileResponse]{ClientStream: stream}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Keeper_UpdateTextFileClient = grpc.ClientStreamingClient[UpdateTextFileRequest, UpdateTextFileResponse]
 
 func (c *keeperClient) AddCreditCard(ctx context.Context, in *AddCreditCardRequest, opts ...grpc.CallOption) (*AddCreditCardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -325,7 +328,7 @@ type KeeperServer interface {
 	UploadText(context.Context, *UploadTextRequest) (*UploadTextResponse, error)
 	DeleteText(context.Context, *DeleteTextRequest) (*DeleteTextResponse, error)
 	UpdateText(context.Context, *UpdateTextRequest) (*UpdateTextResponse, error)
-	UpdateTextFile(context.Context, *UpdateTextFileRequest) (*UpdateTextFileResponse, error)
+	UpdateTextFile(grpc.ClientStreamingServer[UpdateTextFileRequest, UpdateTextFileResponse]) error
 	AddCreditCard(context.Context, *AddCreditCardRequest) (*AddCreditCardResponse, error)
 	GetCreditCardList(context.Context, *CreditCardRequest) (*CreditCardListResponse, error)
 	UpdateCreditCard(context.Context, *UpdateCreditCardRequest) (*UpdateCreditCardResponse, error)
@@ -388,8 +391,8 @@ func (UnimplementedKeeperServer) DeleteText(context.Context, *DeleteTextRequest)
 func (UnimplementedKeeperServer) UpdateText(context.Context, *UpdateTextRequest) (*UpdateTextResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateText not implemented")
 }
-func (UnimplementedKeeperServer) UpdateTextFile(context.Context, *UpdateTextFileRequest) (*UpdateTextFileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateTextFile not implemented")
+func (UnimplementedKeeperServer) UpdateTextFile(grpc.ClientStreamingServer[UpdateTextFileRequest, UpdateTextFileResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method UpdateTextFile not implemented")
 }
 func (UnimplementedKeeperServer) AddCreditCard(context.Context, *AddCreditCardRequest) (*AddCreditCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCreditCard not implemented")
@@ -672,23 +675,12 @@ func _Keeper_UpdateText_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keeper_UpdateTextFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateTextFileRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KeeperServer).UpdateTextFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Keeper_UpdateTextFile_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).UpdateTextFile(ctx, req.(*UpdateTextFileRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+func _Keeper_UpdateTextFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(KeeperServer).UpdateTextFile(&grpc.GenericServerStream[UpdateTextFileRequest, UpdateTextFileResponse]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Keeper_UpdateTextFileServer = grpc.ClientStreamingServer[UpdateTextFileRequest, UpdateTextFileResponse]
 
 func _Keeper_AddCreditCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddCreditCardRequest)
@@ -818,10 +810,6 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Keeper_UpdateText_Handler,
 		},
 		{
-			MethodName: "updateTextFile",
-			Handler:    _Keeper_UpdateTextFile_Handler,
-		},
-		{
 			MethodName: "addCreditCard",
 			Handler:    _Keeper_AddCreditCard_Handler,
 		},
@@ -859,6 +847,11 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _Keeper_UploadTextFile_Handler,
 			ClientStreams: true,
 		},
+		{
+			StreamName:    "updateTextFile",
+			Handler:       _Keeper_UpdateTextFile_Handler,
+			ClientStreams: true,
+		},
 	},
-	Metadata: "proto/keeper.proto",
+	Metadata: "keeper.proto",
 }

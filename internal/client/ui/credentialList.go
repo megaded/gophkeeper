@@ -55,7 +55,7 @@ func (m credentialListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.list, cmd = m.list.Update(msg)
 					return m, cmd
 				}
-				return NewCredentialListModel(m.ctx, m.client, m.back), nil
+				return NewCredentialListModel(m.ctx, m.client), nil
 			}
 		}
 	case tea.WindowSizeMsg:
@@ -73,7 +73,7 @@ func (m credentialListModel) View() string {
 }
 
 // Создание модели списка данных логин\пароль
-func NewCredentialListModel(ctx context.Context, client KeeperClient, back tea.Model) credentialListModel {
+func NewCredentialListModel(ctx context.Context, client KeeperClient) credentialListModel {
 	creds, err := client.GetCredentials(ctx)
 	if err != nil {
 		m := credentialListModel{list: list.New(nil, list.NewDefaultDelegate(), 0, 0)}
@@ -87,7 +87,7 @@ func NewCredentialListModel(ctx context.Context, client KeeperClient, back tea.M
 	}
 	m := credentialListModel{client: client, list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.list.Title = "Логины и пароли"
-	m.back = back
+	m.back = NewDataMenu(ctx, client)
 	m.ctx = ctx
 	return m
 }

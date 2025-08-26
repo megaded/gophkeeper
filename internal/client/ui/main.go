@@ -69,8 +69,8 @@ type TextKeeperClient interface {
 
 func InitialMainModel(ctx context.Context) mainModel {
 	client := proto.NewKeeperClient()
-	loginModel := InitialLoginModel(client)
-	registerModel := InitialRegisterModel(client, loginModel)
+	loginModel := InitialLoginModel(ctx, client)
+	registerModel := InitialRegisterModel(ctx, client)
 	componentMap := make(map[string]tea.Model)
 	componentMap[login] = loginModel
 	componentMap[register] = registerModel

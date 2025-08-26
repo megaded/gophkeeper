@@ -53,3 +53,16 @@ func (s *Server) DeleteCredential(ctx context.Context, req *pb.DeleteCredentialR
 	}
 	return &pb.DeleteCredentialResponse{}, nil
 }
+
+// Обновляет тип данных логин\пароль по Id
+func (s Server) UpdateCredentials(ctx context.Context, req *pb.UpdateCredentialsRequest) (*pb.UpdateCredentialsResponse, error) {
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = s.credManager.UpdateCredentials(ctx, userId, dto.Credentials{Login: req.Credentials.Login, Password: req.Credentials.Password, Description: req.Credentials.Description})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UpdateCredentialsResponse{}, nil
+}

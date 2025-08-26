@@ -21,15 +21,15 @@ const (
 )
 
 var (
-	dictDataTypeRender = map[dataType]func(ctx context.Context, kc KeeperClient, back tea.Model) tea.Model{
-		card: func(ctx context.Context, kc KeeperClient, back tea.Model) tea.Model {
-			return NewCreditCardListModel(ctx, kc, back)
+	dictDataTypeRender = map[dataType]func(ctx context.Context, kc KeeperClient) tea.Model{
+		card: func(ctx context.Context, kc KeeperClient) tea.Model {
+			return NewCreditCardListModel(ctx, kc)
 		},
-		binary: func(ctx context.Context, kc KeeperClient, back tea.Model) tea.Model {
-			return NewUploadFileModel(ctx, kc, back)
+		binary: func(ctx context.Context, kc KeeperClient) tea.Model {
+			return NewUploadFileModel(ctx, kc)
 		},
-		cred: func(ctx context.Context, kc KeeperClient, back tea.Model) tea.Model {
-			return NewCredentialListModel(ctx, kc, back)
+		cred: func(ctx context.Context, kc KeeperClient) tea.Model {
+			return NewCredentialListModel(ctx, kc)
 		},
 	}
 )
@@ -77,6 +77,7 @@ type dataMenuModel struct {
 	list     list.Model
 	quitting bool
 	client   KeeperClient
+	ctx      context.Context
 }
 
 func (m dataMenuModel) Init() tea.Cmd {
@@ -99,7 +100,7 @@ func (m dataMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
 				createFunc := dictDataTypeRender[i.dataType]
-				return createFunc(m.client), nil
+				return createFunc(m.ctx, m.client), nil
 			}
 		}
 	}
@@ -113,7 +114,7 @@ func (m dataMenuModel) View() string {
 	return "\n" + m.list.View()
 }
 
-func NewDataMenu(client KeeperClient) dataMenuModel {
+func NewDataMenu(ctx context.Context, client KeeperClient) dataMenuModel {
 	items := []list.Item{
 		item{name: "Логин/пароль", dataType: cred},
 		item{name: "Текстовые данные", dataType: file},
@@ -123,7 +124,7 @@ func NewDataMenu(client KeeperClient) dataMenuModel {
 
 	const defaultWidth = 20
 
-	l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
+	l := list.New(items, itemDelegate{}, defaultWidth, 14)
 	l.Title = "Типы данных"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
@@ -131,5 +132,5 @@ func NewDataMenu(client KeeperClient) dataMenuModel {
 	l.Styles.PaginationStyle = paginationStyle
 	l.Styles.HelpStyle = helpMenuStyle
 
-	return dataMenuModel{list: l, client: client}
+	return dataMenuModel{list: l, client: client, ctx: ctx}
 }

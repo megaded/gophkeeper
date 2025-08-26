@@ -56,6 +56,7 @@ func (s *Server) UploadBinaryFile(stream grpc.ClientStreamingServer[pb.UploadBin
 	return stream.SendAndClose(&pb.UploadBinaryFileResponse{})
 }
 
+// Загрузка файла
 func (s *Server) DownloadBinaryFile(req *pb.DownloadBinaryFileRequest, resp grpc.ServerStreamingServer[pb.DownloadBinaryFileResponse]) error {
 	logger.Log.Info("Начинаем загрузку файла", zap.Int64("id", req.Id))
 	ctx := resp.Context()
@@ -86,6 +87,7 @@ func (s *Server) DownloadBinaryFile(req *pb.DownloadBinaryFileRequest, resp grpc
 	return nil
 }
 
+// Получение списка файлов
 func (s *Server) GetBinaryFileList(ctx context.Context, request *pb.BinaryFileListRequest) (*pb.BinaryFileListResponse, error) {
 	userId, err := getUserId(ctx)
 	if err != nil {
@@ -107,5 +109,60 @@ func (s *Server) GetBinaryFileList(ctx context.Context, request *pb.BinaryFileLi
 // Загружает текстовый файл произвольной длинны до 5 гигабайт
 // Пользователь определяется по переданому токену
 func (s Server) UploadTextFile(grpc.ClientStreamingServer[pb.UploadTextFileRequest, pb.UploadTextFileRequest]) error {
-	panic("неаы")
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+}
+
+func (s Server) DeleteBinaryFile(ctx context.Context, req *pb.DeleteBinaryFileRequest) (*pb.DeleteBinaryFileResponse, error) {
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = s.binaryManager.DeleteBinaryFile(ctx, userId, uint(req.Id))
+	if err != nil {
+		return nil, err
+	}
+	return &pb.DeleteBinaryFileResponse{}, nil
+}
+
+func (s Server) UpdateBinaryFile(stream grpc.ClientStreamingServer[pb.UpdateBinaryFileRequest, pb.UpdateBinaryFileResponse]) error {
+	ctx := stream.Context()
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return err
+	}
+	rd, wr := io.Pipe()
+	req, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	var totalSize int64 = int64(len(req.Content))
+	defer rd.Close()
+
+	go func() {
+		wr.Write(req.Content)
+		defer wr.Close()
+		for {
+			req, err := stream.Recv()
+			if err == io.EOF {
+				return
+			}
+			if err != nil {
+				wr.CloseWithError(err)
+				return
+			}
+			totalSize = totalSize + int64(len(req.Content))
+
+			wr.Write(req.Content)
+		}
+	}()
+
+	err = s.binaryManager.UpdateBinaryFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
+	if err != nil {
+		return err
+	}
+	return stream.SendAndClose(&pb.UpdateBinaryFileResponse{})
 }

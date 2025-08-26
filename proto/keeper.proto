@@ -184,14 +184,14 @@ message DeleteTextResponse{
 
 message Text{
     uint32 id = 1;
-    bool idFile = 2;
+    bool isFile = 2;
     string description = 3;
     string content = 4;
     string filename = 5;
 }
 
 message UpdateTextRequest{
-    uint32 id = 1;
+    Text text = 1;
 }
 
 message TextListRequest{
@@ -246,7 +246,7 @@ service Keeper {
   rpc uploadText (UploadTextRequest) returns (UploadTextResponse);
   rpc deleteText(DeleteTextRequest) returns (DeleteTextResponse);
   rpc updateText(UpdateTextRequest) returns (UpdateTextResponse);
-  rpc updateTextFile(UpdateTextFileRequest) returns (UpdateTextFileResponse);
+  rpc updateTextFile(stream UpdateTextFileRequest) returns (UpdateTextFileResponse);
  
   rpc addCreditCard (AddCreditCardRequest) returns (AddCreditCardResponse);
   rpc getCreditCardList(CreditCardRequest) returns (CreditCardListResponse);

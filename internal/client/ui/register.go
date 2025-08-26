@@ -27,11 +27,11 @@ type registerModel struct {
 	back       tea.Model
 }
 
-func InitialRegisterModel(client KeeperClient, back tea.Model) registerModel {
+func InitialRegisterModel(ctx context.Context, client KeeperClient) registerModel {
 	m := registerModel{
 		client: client,
 		inputs: make([]textinput.Model, 2),
-		back:   back,
+		back:   InitialLoginModel(ctx, client),
 	}
 
 	var t textinput.Model
@@ -71,7 +71,7 @@ func (m registerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case tea.KeyCtrlR:
-			return InitialLoginModel(m.client), nil
+			return InitialLoginModel(m.ctx, m.client), nil
 
 		case tea.KeyEnter:
 			if m.focusIndex == 2 {

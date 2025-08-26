@@ -12,7 +12,7 @@ func (c *keeperClient) AddCreditCard(ctx context.Context, dto dto.Card) error {
 	if err != nil {
 		return err
 	}
-	req := &pb.AddCreditCardRequest{Number: dto.Number, Exp: dto.Exp, Cvv: dto.CVE, Description: dto.Description}
+	req := &pb.AddCreditCardRequest{Number: dto.Number, Exp: dto.Exp, Cvv: dto.CVV, Description: dto.Description}
 	_, err = c.client.AddCreditCard(ctx, req)
 	return err
 }
@@ -30,7 +30,7 @@ func (c *keeperClient) GetCreditCards(ctx context.Context) ([]dto.Card, error) {
 	}
 	result := make([]dto.Card, 0, len(resp.CreditCards))
 	for _, k := range resp.CreditCards {
-		result = append(result, dto.Card{Number: k.Number, Exp: k.Exp, CVE: k.Cvv, Description: k.Description})
+		result = append(result, dto.Card{Number: k.Number, Exp: k.Exp, CVV: k.Cvv, Description: k.Description})
 	}
 	return result, nil
 }
@@ -53,7 +53,7 @@ func (c *keeperClient) UpdateCreditCard(ctx context.Context, dto dto.Card) error
 		return err
 	}
 	req := pb.UpdateCreditCardRequest{
-		Card: &pb.CreditCard{Id: uint32(dto.Id), Description: dto.Description, Number: dto.Number, Exp: dto.Exp, Cvv: dto.CVE},
+		Card: &pb.CreditCard{Id: uint32(dto.Id), Description: dto.Description, Number: dto.Number, Exp: dto.Exp, Cvv: dto.CVV},
 	}
 	_, err = c.client.UpdateCreditCard(ctx, &req)
 	if err != nil {
