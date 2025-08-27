@@ -154,7 +154,7 @@ func (s Server) UpdateBinaryFile(stream grpc.ClientStreamingServer[pb.UpdateBina
 		}
 	}()
 
-	err = s.binaryManager.UpdateBinaryFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
+	err = s.binaryManager.UpdateBinaryFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description, Id: uint(req.Id)}, rd)
 	if err != nil {
 		return err
 	}

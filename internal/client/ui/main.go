@@ -4,7 +4,6 @@ import (
 	"context"
 	"gophkeeper/internal/client/proto"
 	"gophkeeper/internal/server/dto"
-	"io"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -30,6 +29,7 @@ type KeeperClient interface {
 	CreditCardKeeperClient
 	CredentialsKeeperClient
 	BinaryKeeperClient
+	TextKeeperClient
 }
 
 type AuthKeeperClient interface {
@@ -60,8 +60,9 @@ type BinaryKeeperClient interface {
 }
 
 type TextKeeperClient interface {
-	UploadTextFile(ctx context.Context, reader io.Reader, fileName string, description string, size int64) error
-	UploadText(ctx context.Context, reader io.Reader, fileName string, description string, size int64) error
+	UploadTextFile(ctx context.Context, fileName string, description string) error
+	UpdateTextFile(ctx context.Context, filePath string, description string, id uint) error
+	UploadText(ctx context.Context, content string, description string) error
 	GetTextList(ctx context.Context) ([]dto.Text, error)
 	DeleteText(ctx context.Context, id uint) error
 	UpdateText(ctx context.Context, dto dto.Text) error

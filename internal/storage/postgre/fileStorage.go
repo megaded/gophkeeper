@@ -7,6 +7,7 @@ import (
 	"gophkeeper/internal/internal_error"
 	"gophkeeper/internal/storage/model"
 
+	"github.com/guregu/null/v6"
 	"gorm.io/gorm"
 )
 
@@ -34,7 +35,7 @@ func (s PgStorage) AddTextFile(ctx context.Context, userId uint, description str
 	model := model.Text{}
 	model.UserId = userId
 	model.Description = description
-	model.BinaryId = binaryId
+	model.BinaryId = null.Int32From(int32(binaryId))
 	model.IsFile = true
 	r := db.Create(&model)
 	if r.Error != nil {
@@ -48,7 +49,7 @@ func (s PgStorage) GetFileInfo(ctx context.Context, fileId uint) (model.Binary, 
 	result := s.db.WithContext(ctx).Where("id = ?", fileId).First(&model)
 	switch {
 	case errors.Is(result.Error, gorm.ErrRecordNotFound):
-		return model, internal_error.ErrUserNotFound
+		return model, internal_error.ErrRecordNotFound
 	default:
 		return model, result.Error
 	}
@@ -68,7 +69,7 @@ func (s PgStorage) GetBinaryFiles(ctx context.Context, userId uint) ([]model.Bin
 
 // Обновляет бинарный файл
 func (s PgStorage) UpdateBinary(ctx context.Context, id uint, externalName string, originalName string, description string) error {
-	r := s.db.Model(&model.Binary{}).Where("id = ?", id).Updates(model.Binary{ExternalFileName: externalName, OriginalFileName: originalName, Description: description})
+	r := s.db.WithContext(ctx).Model(&model.Binary{}).Where("id = ?", id).Updates(model.Binary{ExternalFileName: externalName, OriginalFileName: originalName, Description: description})
 	if r.Error != nil {
 		return r.Error
 	}
@@ -77,7 +78,7 @@ func (s PgStorage) UpdateBinary(ctx context.Context, id uint, externalName strin
 
 // Удаление бинарных данных по Id
 func (s PgStorage) DeleteBinary(ctx context.Context, id uint) error {
-	result := s.db.WithContext(ctx).Delete(model.Binary{}, id)
+	result := s.db.WithContext(ctx).Delete(&model.Binary{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

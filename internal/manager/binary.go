@@ -27,12 +27,28 @@ func (b BinaryManager) uploadInternal(ctx context.Context, userId uint, dtos dto
 	if err != nil {
 		return dto.BinaryFile{}, err
 	}
-	new, err := b.storager.AddBinary(ctx, userId, dtos.Description, dtos.FileName, name)
+	var dbModel model.Binary
+	if dtos.Id == 0 {
+		dbModel, err = b.storager.AddBinary(ctx, userId, dtos.Description, dtos.FileName, name)
+		if err != nil {
+			return dto.BinaryFile{}, err
+		}
+	} else {
+		err = b.storager.UpdateBinary(ctx, dtos.Id, name, dtos.FileName, dtos.Description)
+		if err != nil {
+			return dto.BinaryFile{}, err
+		}
+		dbModel, err = b.storager.GetFileInfo(ctx, dtos.Id)
+		if err != nil {
+			return dto.BinaryFile{}, nil
+		}
+	}
+
 	if err != nil {
 		b.fileStorager.DeleteFile(ctx, userId, name)
 		return dto.BinaryFile{}, err
 	}
-	return dto.BinaryFile{Id: new.ID, UserId: new.ID, Description: new.Description, FileName: new.OriginalFileName, ExternalFileName: new.ExternalFileName}, nil
+	return dto.BinaryFile{Id: dbModel.ID, UserId: dbModel.ID, Description: dbModel.Description, FileName: dbModel.OriginalFileName, ExternalFileName: dbModel.ExternalFileName}, nil
 }
 
 // Загрузка файла
@@ -123,6 +139,10 @@ func (b BinaryManager) DeleteBinaryFile(ctx context.Context, userId uint, id uin
 	if fileInfo.UserId != userId {
 		return internal_error.ErrorAccessDenied
 	}
+	err = b.storager.DeleteBinary(ctx, id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -166,4 +186,5 @@ type fileMetaStorager interface {
 	GetFileInfo(ctx context.Context, fileId uint) (model.Binary, error)
 	GetBinaryFiles(ctx context.Context, userId uint) ([]model.Binary, error)
 	UpdateBinary(ctx context.Context, id uint, externalName string, originalName string, description string) error
+	DeleteBinary(ctx context.Context, id uint) error
 }

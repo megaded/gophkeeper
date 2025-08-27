@@ -28,7 +28,7 @@ func (c *keeperClient) GetCredentials(ctx context.Context) ([]dto.Credentials, e
 	}
 	result := make([]dto.Credentials, 0, len(resp.Credentials))
 	for _, k := range resp.Credentials {
-		result = append(result, dto.Credentials{Login: k.Login, Password: k.Password, Description: k.Description})
+		result = append(result, dto.Credentials{Login: k.Login, Password: k.Password, Description: k.Description, Id: uint(k.Id)})
 	}
 	return result, nil
 }

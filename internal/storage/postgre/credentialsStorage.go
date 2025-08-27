@@ -34,7 +34,7 @@ func (s PgStorage) GetCredential(ctx context.Context, id uint) (model.Credential
 	result := s.db.WithContext(ctx).Where("id = ?", id).First(&model)
 	switch {
 	case errors.Is(result.Error, gorm.ErrRecordNotFound):
-		return model, internal_error.ErrUserNotFound
+		return model, internal_error.ErrRecordNotFound
 	default:
 		return model, result.Error
 	}
@@ -54,7 +54,7 @@ func (s PgStorage) GetCredentials(ctx context.Context, userId uint) ([]model.Cre
 
 // Удаление данных логин\пароль по Id
 func (s PgStorage) DeleteCredentials(ctx context.Context, id uint) error {
-	result := s.db.WithContext(ctx).Delete(model.Credentials{}, id)
+	result := s.db.WithContext(ctx).Delete(&model.Credentials{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

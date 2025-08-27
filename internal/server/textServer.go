@@ -11,7 +11,15 @@ import (
 
 // Загружает текстовые данные
 func (s Server) UploadText(ctx context.Context, req *pb.UploadTextRequest) (*pb.UploadTextResponse, error) {
-	panic("неа")
+	userId, err := getUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = s.textManager.UploadText(ctx, dto.Text{UserId: userId, Content: req.Content, Description: req.Description, IsFile: false})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UploadTextResponse{}, nil
 }
 
 // Удаляет текстовые данные по Id

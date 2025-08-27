@@ -30,7 +30,7 @@ func (c *keeperClient) GetCreditCards(ctx context.Context) ([]dto.Card, error) {
 	}
 	result := make([]dto.Card, 0, len(resp.CreditCards))
 	for _, k := range resp.CreditCards {
-		result = append(result, dto.Card{Number: k.Number, Exp: k.Exp, CVE: k.Cvv, Description: k.Description})
+		result = append(result, dto.Card{Id: uint(k.Id), Number: k.Number, Exp: k.Exp, CVE: k.Cvv, Description: k.Description})
 	}
 	return result, nil
 }

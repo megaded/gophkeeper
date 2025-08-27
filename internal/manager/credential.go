@@ -46,7 +46,7 @@ func (c CredentialsManager) GetCredentials(ctx context.Context, userId uint) ([]
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, dto.Credentials{Login: login, Password: password, Description: cred.Description})
+		result = append(result, dto.Credentials{Login: login, Password: password, Description: cred.Description, Id: cred.ID})
 	}
 	return result, err
 }

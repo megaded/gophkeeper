@@ -1,6 +1,9 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"github.com/guregu/null/v6"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -43,7 +46,7 @@ type Text struct {
 	User        User
 	Description string
 	Content     string
-	BinaryId    uint
+	BinaryId    null.Int32
 	Binary      Binary
 	IsFile      bool
 }

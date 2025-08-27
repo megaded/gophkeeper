@@ -24,6 +24,7 @@ type textStorager interface {
 }
 
 func (f TextManager) UploadText(ctx context.Context, dto dto.Text) error {
+
 	return f.storager.AddText(ctx, dto.UserId, dto.Content, dto.Description)
 }
 
@@ -73,5 +74,5 @@ func (c TextManager) GetTextInfo(ctx context.Context, id uint) (dto.Text, error)
 	if err != nil {
 		return dto.Text{}, err
 	}
-	return dto.Text{UserId: text.UserId, Content: text.Content, IsFile: text.IsFile, BinaryId: text.BinaryId, Description: text.Description}, nil
+	return dto.Text{UserId: text.UserId, Content: text.Content, IsFile: text.IsFile, BinaryId: uint(text.BinaryId.Int32), Description: text.Description}, nil
 }

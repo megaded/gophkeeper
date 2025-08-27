@@ -34,7 +34,7 @@ func (s *Server) GetCredentialsList(ctx context.Context, req *pb.CredentialListR
 	result := make([]*pb.Credential, 0, len(r))
 	resp := pb.CredentialListResponse{}
 	for _, cre := range r {
-		result = append(result, &pb.Credential{Login: cre.Login, Password: cre.Password, Description: cre.Description})
+		result = append(result, &pb.Credential{Login: cre.Login, Password: cre.Password, Description: cre.Description, Id: uint32(cre.Id)})
 	}
 	resp.Credentials = result
 	return &resp, nil
@@ -60,7 +60,7 @@ func (s Server) UpdateCredentials(ctx context.Context, req *pb.UpdateCredentials
 	if err != nil {
 		return nil, err
 	}
-	err = s.credManager.UpdateCredentials(ctx, userId, dto.Credentials{Login: req.Credentials.Login, Password: req.Credentials.Password, Description: req.Credentials.Description})
+	err = s.credManager.UpdateCredentials(ctx, userId, dto.Credentials{Id: uint(req.Credentials.Id), Login: req.Credentials.Login, Password: req.Credentials.Password, Description: req.Credentials.Description})
 	if err != nil {
 		return nil, err
 	}

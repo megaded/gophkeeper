@@ -60,7 +60,7 @@ func (c CreditCardManager) GetCreditCards(ctx context.Context, userId uint) ([]d
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, dto.Card{Number: number, Exp: exp, CVE: cvv, Description: card.Description})
+		result = append(result, dto.Card{Number: number, Exp: exp, CVE: cvv, Description: card.Description, Id: card.ID})
 	}
 	return result, nil
 }

@@ -12,7 +12,7 @@ import (
 
 // Удаляет тип бансковская карта по Id
 func (s PgStorage) DeleteCreditCard(ctx context.Context, id uint) error {
-	result := s.db.WithContext(ctx).Delete(model.CreditCard{}, id)
+	result := s.db.WithContext(ctx).Delete(&model.CreditCard{}, id)
 	if result.Error != nil {
 		return result.Error
 	}
