@@ -16,7 +16,7 @@ type dataType int
 const (
 	card dataType = iota
 	cred
-	file
+	text
 	binary
 )
 
@@ -26,10 +26,13 @@ var (
 			return NewCreditCardListModel(ctx, kc)
 		},
 		binary: func(ctx context.Context, kc KeeperClient) tea.Model {
-			return NewUploadFileModel(ctx, kc)
+			return NewFileListModel(ctx, kc)
 		},
 		cred: func(ctx context.Context, kc KeeperClient) tea.Model {
 			return NewCredentialListModel(ctx, kc)
+		},
+		text: func(ctx context.Context, kc KeeperClient) tea.Model {
+			return NewTextListModel(ctx, kc)
 		},
 	}
 )
@@ -117,7 +120,7 @@ func (m dataMenuModel) View() string {
 func NewDataMenu(ctx context.Context, client KeeperClient) dataMenuModel {
 	items := []list.Item{
 		item{name: "Логин/пароль", dataType: cred},
-		item{name: "Текстовые данные", dataType: file},
+		item{name: "Текстовые данные", dataType: text},
 		item{name: "Бинарные данные", dataType: binary},
 		item{name: "Банковских карт", dataType: card},
 	}

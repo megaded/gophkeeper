@@ -71,7 +71,7 @@ func (m registerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case tea.KeyCtrlR:
-			return InitialLoginModel(m.ctx, m.client), nil
+			return m.back, nil
 
 		case tea.KeyEnter:
 			if m.focusIndex == 2 {
@@ -151,8 +151,6 @@ func (m registerModel) View() string {
 		b.WriteString(helpStyle.Render("Регистрация прошла успешно"))
 	}
 	b.WriteString(helpStyle.Render(" (ctrl+r для входа)"))
-	b.WriteString(fmt.Sprintf("Логин %s \n", m.login))
-	b.WriteString(fmt.Sprintf("Пароль %s \n", m.password))
 	if m.err != nil {
 		b.WriteString("Ошибка регистрации \n")
 		b.WriteString((*m.err).Error())

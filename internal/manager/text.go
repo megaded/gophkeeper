@@ -35,7 +35,7 @@ func (f TextManager) GetTextList(ctx context.Context, userId uint) ([]dto.Text, 
 	}
 	r := make([]dto.Text, 0, len(data))
 	for _, i := range data {
-		r = append(r, dto.Text{Id: i.ID, IsFile: i.IsFile, Description: i.Description})
+		r = append(r, dto.Text{Id: i.ID, IsFile: i.IsFile, Description: i.Description, Content: i.Content})
 	}
 	return r, nil
 }
@@ -49,7 +49,7 @@ func (c TextManager) UpdateText(ctx context.Context, userId uint, dto dto.Text) 
 	if text.UserId != userId {
 		return internal_error.ErrorAccessDenied
 	}
-	return c.storager.UpdateText(ctx, userId, dto.Content, dto.Description)
+	return c.storager.UpdateText(ctx, dto.Id, dto.Content, dto.Description)
 }
 
 // Удаление текстовый данных по Id

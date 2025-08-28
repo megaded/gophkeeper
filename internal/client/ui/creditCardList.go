@@ -3,6 +3,7 @@ package ui
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -37,13 +38,19 @@ func (m creditCardListModel) Init() tea.Cmd {
 func (m creditCardListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		if msg.Type == tea.KeyCtrlB {
+			return NewDataMenu(m.ctx, m.client), nil
+		}
 		if msg.Type == tea.KeyCtrlC {
 			return m, tea.Quit
 		}
-		if msg.Type == tea.KeyEnter {
+		if msg.Type == tea.KeyCtrlN {
+			return InitCreditCardModel(m.client), nil
+		}
+		if msg.Type == tea.KeyEnter || msg.Type == tea.KeyCtrlR {
 			card, ok := m.list.SelectedItem().(creditCard)
 			if ok {
-				return InitialCreditCardEditModel(m.client, card.number, card.exp, card.cvv), nil
+				return InitialCreditCardEditModel(m.client, card.id, card.number, card.exp, card.cvv), nil
 			}
 		}
 		if msg.Type == tea.KeyCtrlD {
@@ -69,7 +76,11 @@ func (m creditCardListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m creditCardListModel) View() string {
-	return docStyle.Render(m.list.View())
+	var sb strings.Builder
+	sb.WriteString(docStyle.Render(m.list.View()))
+	sb.WriteString("\n")
+	sb.WriteString(help)
+	return sb.String()
 }
 
 func NewCreditCardListModel(ctx context.Context, client KeeperClient) creditCardListModel {

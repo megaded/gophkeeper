@@ -46,8 +46,8 @@ func (s Server) GetTextList(ctx context.Context, req *pb.TextListRequest) (*pb.T
 		return nil, err
 	}
 	data := make([]*pb.Text, 0, len(model))
-	for _, f := range data {
-		data = append(data, &pb.Text{Id: f.Id, Content: f.Content, IsFile: f.IsFile, Description: f.Description})
+	for _, f := range model {
+		data = append(data, &pb.Text{Id: uint32(f.Id), Content: f.Content, IsFile: f.IsFile, Description: f.Description})
 	}
 	resp := pb.TextListResponse{}
 	resp.Info = data

@@ -64,7 +64,10 @@ func (m uploadFile) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, cmd
 		case tea.KeyCtrlC:
 			return m, tea.Quit
+		case tea.KeyCtrlB:
+			return NewDataMenu(m.ctx, m.client), nil
 		}
+
 	case errMsg:
 		m.err = msg
 		return m, nil

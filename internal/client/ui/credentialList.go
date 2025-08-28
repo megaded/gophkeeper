@@ -4,19 +4,20 @@ package ui
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type credential struct {
-	login, password, description, cvv string
-	id                                uint
+	login, password, description string
+	id                           uint
 }
 
 func (i credential) Title() string { return i.description }
 func (i credential) Description() string {
-	return fmt.Sprintf("Логин %s Пароль %s CVE %s", i.login, i.password)
+	return fmt.Sprintf("Логин %s Пароль %s", i.login, i.password)
 }
 func (i credential) FilterValue() string { return i.login }
 
@@ -35,18 +36,21 @@ func (m credentialListModel) Init() tea.Cmd {
 func (m credentialListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		if msg.Type == tea.KeyCtrlB {
+			return NewDataMenu(m.ctx, m.client), nil
+		}
 		if msg.Type == tea.KeyCtrlC {
 			return m, tea.Quit
 		}
 		if msg.Type == tea.KeyEnter {
-			card, ok := m.list.SelectedItem().(creditCard)
+			cred, ok := m.list.SelectedItem().(credential)
 			if ok {
 
-				return InitialCreditCardEditModel(m.client, card.number, card.exp, card.cvv), nil
+				return InitialEditCreditialModel(m.ctx, m.client, cred), nil
 			}
 		}
 		if msg.Type == tea.KeyCtrlD {
-			cred, ok := m.list.SelectedItem().(creditCard)
+			cred, ok := m.list.SelectedItem().(credential)
 			if ok {
 				err := m.client.DeleteCreditial(m.ctx, cred.id)
 				if err != nil {
@@ -55,7 +59,10 @@ func (m credentialListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.list, cmd = m.list.Update(msg)
 					return m, cmd
 				}
-				return NewCredentialListModel(m.ctx, m.client), nil
+				nm := NewCredentialListModel(m.ctx, m.client)
+				var cmd tea.Cmd
+				nm.list, cmd = nm.list.Update(msg)
+				return nm, cmd
 			}
 		}
 	case tea.WindowSizeMsg:
@@ -69,7 +76,11 @@ func (m credentialListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m credentialListModel) View() string {
-	return docStyle.Render(m.list.View())
+	var sb strings.Builder
+	sb.WriteString(docStyle.Render(m.list.View()))
+	sb.WriteString("\n")
+	sb.WriteString(help)
+	return sb.String()
 }
 
 // Создание модели списка данных логин\пароль

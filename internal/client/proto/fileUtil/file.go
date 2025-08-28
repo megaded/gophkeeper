@@ -35,3 +35,9 @@ func SaveLocalFile(reader io.Reader, fileName string) error {
 	}
 	return nil
 }
+
+func GetDownloadDir(fileName string) string {
+	rootDir, _ := os.Getwd()
+
+	return filepath.Join(rootDir, path, fileName)
+}

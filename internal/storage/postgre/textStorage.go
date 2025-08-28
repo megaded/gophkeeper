@@ -61,7 +61,7 @@ func (s PgStorage) UpdateText(ctx context.Context, id uint, content string, desc
 
 // Удаление текстовый данных
 func (s PgStorage) DeleteText(ctx context.Context, id uint) error {
-	result := s.db.WithContext(ctx).Delete(model.Text{}, id)
+	result := s.db.WithContext(ctx).Delete(&model.Text{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

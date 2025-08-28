@@ -19,13 +19,6 @@ const (
 	cvv
 )
 
-type modeType int
-
-const (
-	new modeType = iota
-	edit
-)
-
 const (
 	hotPink  = lipgloss.Color("#FF06B7")
 	darkGray = lipgloss.Color("#767676")
@@ -48,6 +41,7 @@ type creditCardModel struct {
 	mode    modeType
 	client  KeeperClient
 	ctx     context.Context
+	id      uint
 }
 
 // Validator functions to ensure valid input
@@ -110,7 +104,7 @@ func InitCreditCardModel(client KeeperClient) creditCardModel {
 	}
 }
 
-func InitialCreditCardEditModel(client KeeperClient, ccn string, exp string, cvv string) creditCardModel {
+func InitialCreditCardEditModel(client KeeperClient, id uint, ccn string, exp string, cvv string) creditCardModel {
 	return creditCardModel{
 		inputs:  getInputs(),
 		focused: 0,
@@ -120,6 +114,7 @@ func InitialCreditCardEditModel(client KeeperClient, ccn string, exp string, cvv
 		exp:     exp,
 		cvv:     cvv,
 		client:  client,
+		id:      id,
 	}
 }
 
@@ -157,12 +152,23 @@ func (m creditCardModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.focused == len(m.inputs) {
-				err := m.client.AddCreditCard(context.Background(), dto.Card{Number: m.inputs[ccn].Value(), Exp: m.inputs[exp].Value(), CVE: m.inputs[cvv].Value()})
-				if err != nil {
-					fmt.Println(err.Error())
-					return m, tea.Quit
+				if m.mode == new {
+					err := m.client.AddCreditCard(context.Background(), dto.Card{Number: m.inputs[ccn].Value(), Exp: m.inputs[exp].Value(), CVE: m.inputs[cvv].Value()})
+					if err != nil {
+						fmt.Println(err.Error())
+						return m, tea.Quit
+					}
+					return NewDataMenu(m.ctx, m.client), nil
 				}
-				return NewDataMenu(m.ctx, m.client), tea.Quit
+				if m.mode == edit {
+					err := m.client.UpdateCreditCard(context.Background(), dto.Card{Id: m.id, Number: m.inputs[ccn].Value(), Exp: m.inputs[exp].Value(), CVE: m.inputs[cvv].Value()})
+					if err != nil {
+						fmt.Println(err.Error())
+						return m, tea.Quit
+					}
+					return NewDataMenu(m.ctx, m.client), nil
+				}
+
 			}
 			m.focused++
 		case tea.KeyCtrlC:
@@ -177,7 +183,6 @@ func (m creditCardModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.inputs[m.focused].Focus()
 		}
 
-	// We handle errors just like any other message
 	case errMsg:
 		m.err = msg
 		return m, nil
