@@ -1,0 +1,103 @@
+package ui
+
+import (
+	"context"
+	"fmt"
+	"strings"
+
+	"github.com/charmbracelet/bubbles/list"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+)
+
+var docStyle = lipgloss.NewStyle().Margin(1, 2)
+
+type creditCard struct {
+	number, exp, description, cvv string
+	id                            uint
+}
+
+func (i creditCard) Title() string { return i.description }
+func (i creditCard) Description() string {
+	return fmt.Sprintf("Number %s Exp %s CVE %s", i.number, i.exp, i.cvv)
+}
+func (i creditCard) FilterValue() string { return i.number }
+
+type creditCardListModel struct {
+	list   list.Model
+	client KeeperClient
+	ctx    context.Context
+	back   tea.Model
+	err    error
+}
+
+func (m creditCardListModel) Init() tea.Cmd {
+	return nil
+}
+
+func (m creditCardListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if msg.Type == tea.KeyCtrlB {
+			return NewDataMenu(m.ctx, m.client), nil
+		}
+		if msg.Type == tea.KeyCtrlC {
+			return m, tea.Quit
+		}
+		if msg.Type == tea.KeyCtrlN {
+			return InitCreditCardModel(m.client), nil
+		}
+		if msg.Type == tea.KeyEnter || msg.Type == tea.KeyCtrlR {
+			card, ok := m.list.SelectedItem().(creditCard)
+			if ok {
+				return InitialCreditCardEditModel(m.client, card.id, card.number, card.exp, card.cvv), nil
+			}
+		}
+		if msg.Type == tea.KeyCtrlD {
+			card, ok := m.list.SelectedItem().(creditCard)
+			if ok {
+				err := m.client.DeleteCreditCard(m.ctx, card.id)
+				if err != nil {
+					var cmd tea.Cmd
+					m.list, cmd = m.list.Update(msg)
+					return m, cmd
+				}
+				return NewCreditCardListModel(m.ctx, m.client), nil
+			}
+		}
+	case tea.WindowSizeMsg:
+		h, v := docStyle.GetFrameSize()
+		m.list.SetSize(msg.Width-h, msg.Height-v)
+	}
+
+	var cmd tea.Cmd
+	m.list, cmd = m.list.Update(msg)
+	return m, cmd
+}
+
+func (m creditCardListModel) View() string {
+	var sb strings.Builder
+	sb.WriteString(docStyle.Render(m.list.View()))
+	sb.WriteString("\n")
+	sb.WriteString(help)
+	return sb.String()
+}
+
+func NewCreditCardListModel(ctx context.Context, client KeeperClient) creditCardListModel {
+	cards, err := client.GetCreditCards(context.TODO())
+	if err != nil {
+		m := creditCardListModel{list: list.New(nil, list.NewDefaultDelegate(), 0, 0)}
+		m.list.Title = err.Error()
+		return m
+	}
+
+	items := make([]list.Item, 0, len(cards))
+	for _, k := range cards {
+		items = append(items, creditCard{number: k.Number, exp: k.Exp, description: k.Description, cvv: k.CVE, id: k.Id})
+	}
+	m := creditCardListModel{client: client, list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	m.list.Title = "Список карт"
+	m.back = NewDataMenu(ctx, client)
+	m.ctx = ctx
+	return m
+}

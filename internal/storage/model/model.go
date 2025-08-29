@@ -1,6 +1,9 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"github.com/guregu/null/v6"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -8,34 +11,42 @@ type User struct {
 	Hash string
 }
 
-type UserId struct {
-	UserId uint
-	User   User
-}
-
 type Credentials struct {
 	gorm.Model
-	UserId
-	Login    string
-	Password string
+	UserId      uint
+	User        User
+	Description string
+	Login       []byte
+	Password    []byte
 }
 
 type CreditCard struct {
 	gorm.Model
-	UserId
-	Number string
-	Name   string
-	CVE    string
+	UserId      uint
+	User        User
+	Description string
+	Number      []byte
+	Ext         []byte
+	CVE         []byte
 }
 
 type Binary struct {
-	UserId
 	gorm.Model
-	FileId string
+	UserId           uint
+	User             User
+	Description      string
+	OriginalFileName string
+	ExternalFileName string
+	BuckerName       string
 }
 
 type Text struct {
-	UserId
 	gorm.Model
-	FileId string
+	UserId      uint
+	User        User
+	Description string
+	Content     string
+	BinaryId    null.Int32
+	Binary      Binary
+	IsFile      bool
 }

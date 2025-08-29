@@ -1,0 +1,257 @@
+syntax = "proto3";
+
+package keeper_proto;
+
+option go_package = "proto/keeper";
+
+message NewUserRequest{
+    string login = 1;
+    string password = 2;
+}
+
+message NewUserResponse{
+
+}
+
+message LoginRequest{
+    string login = 1;
+    string password = 2;
+}
+
+message LoginResponse{
+    string token = 1;
+}
+
+message AddCredentialsRequest{
+    string login = 1;
+    string password = 2;
+    string description = 3;
+}
+
+message AddCredentialsResponse{
+
+}
+
+message Credential{
+    string login = 1;
+    string password = 2;
+    string description = 3;
+    uint32 id = 4;
+}
+
+message CredentialListRequest{
+
+}
+
+message CredentialListResponse{
+    repeated Credential credentials = 1;
+}
+
+message DeleteCredentialRequest{
+    uint32 id = 1;
+}
+
+message DeleteCredentialResponse{
+
+}
+
+
+message UploadBinaryFileRequest{
+    string filename = 1;
+    bytes content = 2;
+    string description = 3;
+    int64 size = 4;
+}
+
+message UploadBinaryFileResponse{
+
+}
+
+message DownloadBinaryFileRequest{
+    int64 id = 1;
+}
+
+message DownloadBinaryFileResponse{
+    string filename = 1;
+    bytes content = 2;
+}
+
+message UploadTextFileRequest{
+    string filename = 1;
+    bytes content = 2;
+    string description = 3;
+    int64 size = 4;
+}
+
+message UploadTextFileResponse{
+
+}
+
+message UploadTextRequest{
+    string content = 1;
+    string description = 2;
+}
+
+message UploadTextResponse{
+
+}
+
+
+message AddCreditCardRequest{
+    string number = 1;
+    string exp = 2;
+    string cvv = 3;
+    string description = 4;
+}
+
+message AddCreditCardResponse{
+    
+}
+
+message CreditCard{
+    string number = 1;
+    string exp = 2;
+    string cvv = 3;
+    string description = 4;
+    uint32 id = 5;
+}
+
+message CreditCardRequest{
+
+}
+
+message CreditCardListResponse{
+    repeated CreditCard creditCards = 1; 
+}
+
+message DeleteCreditCardRequest{
+    uint32 id = 1;
+}
+
+message DeleteCreditCardResponse{
+
+}
+
+message BinaryFileListRequest{
+
+}
+
+message BinaryFile{
+    string name = 1;
+    uint32 id = 2;
+    string description = 3;
+}
+
+message BinaryFileListResponse{
+    repeated BinaryFile binaryFiles = 1;
+}
+
+message UpdateCreditCardRequest{
+    CreditCard card = 1;
+}
+
+message UpdateCreditCardResponse{
+
+}
+
+message UpdateCredentialsRequest{
+    Credential credentials = 1;
+}
+
+message UpdateCredentialsResponse{
+
+}
+
+message UpdateBinaryFileRequest{
+    string filename = 1;
+    bytes content = 2;
+    string description = 3;
+    int64 size = 4;
+    uint32 id =5;
+}
+
+message UpdateBinaryFileResponse{
+
+}
+
+message DeleteTextRequest{
+    uint32 id = 1;
+}
+
+message DeleteTextResponse{
+
+}
+
+message Text{
+    uint32 id = 1;
+    bool isFile = 2;
+    string description = 3;
+    string content = 4;
+    string filename = 5;
+}
+
+message UpdateTextRequest{
+    Text text = 1;
+}
+
+message TextListRequest{
+
+}
+
+message TextListResponse{
+    repeated Text info = 1;
+}
+
+message UpdateTextResponse {
+
+}
+
+message UpdateTextFileRequest{
+    string filename = 1;
+    bytes content = 2;
+    string description = 3;
+    int64 size = 4;
+    uint32 id =5;
+}
+
+message UpdateTextFileResponse{
+
+}
+
+message DeleteBinaryFileRequest{
+    uint32 id = 1;
+}
+
+message DeleteBinaryFileResponse{
+
+}
+
+service Keeper {
+  rpc registration(NewUserRequest) returns (NewUserResponse);
+  rpc login(LoginRequest) returns (LoginResponse);
+
+  rpc addCredentials (AddCredentialsRequest) returns (AddCredentialsResponse);
+  rpc getCredentialsList(CredentialListRequest) returns (CredentialListResponse);
+  rpc deleteCredential(DeleteCredentialRequest) returns (DeleteCredentialResponse);
+  rpc updateCredentials(UpdateCredentialsRequest) returns (UpdateCredentialsResponse);
+
+  rpc uploadBinaryFile (stream UploadBinaryFileRequest) returns (UploadBinaryFileResponse);
+  rpc getBinaryFileList (BinaryFileListRequest) returns (BinaryFileListResponse);
+  rpc downloadBinaryFile (DownloadBinaryFileRequest) returns (stream DownloadBinaryFileResponse);
+  rpc updateBinaryFile(stream UpdateBinaryFileRequest) returns (UpdateBinaryFileResponse);
+  rpc deleteBinaryFile(DeleteBinaryFileRequest) returns (DeleteBinaryFileResponse);
+
+  rpc uploadTextFile (stream UploadTextFileRequest) returns (UploadTextFileResponse);
+  rpc getTextList(TextListRequest) returns (TextListResponse);
+  rpc uploadText (UploadTextRequest) returns (UploadTextResponse);
+  rpc deleteText(DeleteTextRequest) returns (DeleteTextResponse);
+  rpc updateText(UpdateTextRequest) returns (UpdateTextResponse);
+  rpc updateTextFile(stream UpdateTextFileRequest) returns (UpdateTextFileResponse);
+ 
+  rpc addCreditCard (AddCreditCardRequest) returns (AddCreditCardResponse);
+  rpc getCreditCardList(CreditCardRequest) returns (CreditCardListResponse);
+  rpc updateCreditCard(UpdateCreditCardRequest) returns (UpdateCreditCardResponse);
+  rpc deleteCreditCard(DeleteCreditCardRequest) returns (DeleteCreditCardResponse);
+} 
+
+
