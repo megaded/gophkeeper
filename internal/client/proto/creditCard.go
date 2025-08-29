@@ -2,8 +2,8 @@ package proto
 
 import (
 	"context"
+	"gophkeeper/internal/dto"
 	"gophkeeper/internal/logger"
-	"gophkeeper/internal/server/dto"
 	pb "gophkeeper/proto"
 )
 

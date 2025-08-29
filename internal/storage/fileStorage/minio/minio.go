@@ -39,7 +39,7 @@ func NewStorage(cfg config.Config) (*MinioStorage, error) {
 	if !ok {
 		err = client.MakeBucket(context.TODO(), bucketPrefix, minio.MakeBucketOptions{})
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 	logger.Log.Info("Minio UP")

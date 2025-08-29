@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/dto"
 	"strconv"
 	"strings"
 

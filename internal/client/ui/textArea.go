@@ -6,7 +6,7 @@ package ui
 import (
 	"context"
 	"fmt"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/dto"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textarea"

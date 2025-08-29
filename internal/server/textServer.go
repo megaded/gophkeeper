@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/dto"
 	pb "gophkeeper/proto"
 	"io"
 
@@ -15,7 +15,7 @@ func (s Server) UploadText(ctx context.Context, req *pb.UploadTextRequest) (*pb.
 	if err != nil {
 		return nil, err
 	}
-	err = s.textManager.UploadText(ctx, dto.Text{UserId: userId, Content: req.Content, Description: req.Description, IsFile: false})
+	err = s.TextManager.UploadText(ctx, dto.Text{UserId: userId, Content: req.Content, Description: req.Description, IsFile: false})
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (s Server) DeleteText(ctx context.Context, req *pb.DeleteTextRequest) (*pb.
 	if err != nil {
 		return nil, err
 	}
-	err = s.textManager.DeleteText(ctx, userId, uint(req.Id))
+	err = s.TextManager.DeleteText(ctx, userId, uint(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (s Server) GetTextList(ctx context.Context, req *pb.TextListRequest) (*pb.T
 	if err != nil {
 		return nil, err
 	}
-	model, err := s.textManager.GetTextList(ctx, userId)
+	model, err := s.TextManager.GetTextList(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s Server) UpdateText(ctx context.Context, req *pb.UpdateTextRequest) (*pb.
 	if err != nil {
 		return nil, err
 	}
-	err = s.textManager.UpdateText(ctx, userId, dto.Text{Content: req.Text.Content, Description: req.Text.Description, Id: uint(req.Text.Id)})
+	err = s.TextManager.UpdateText(ctx, userId, dto.Text{Content: req.Text.Content, Description: req.Text.Description, Id: uint(req.Text.Id)})
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (s Server) UpdateTextFile(stream grpc.ClientStreamingServer[pb.UpdateTextFi
 	}
 
 	var totalSize int64 = int64(len(req.Content))
-	fileInfo, err := s.textManager.GetTextInfo(ctx, uint(req.Id))
+	fileInfo, err := s.TextManager.GetTextInfo(ctx, uint(req.Id))
 	if fileInfo.UserId != userId {
 		return err
 	}
@@ -103,13 +103,13 @@ func (s Server) UpdateTextFile(stream grpc.ClientStreamingServer[pb.UpdateTextFi
 		}
 	}()
 
-	newFileInfo, err := s.binaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
+	newFileInfo, err := s.BinaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
 	if err != nil {
 		return err
 	}
-	err = s.textManager.UpdateText(ctx, userId, dto.Text{Id: uint(req.Id), Description: req.Description, IsFile: true, BinaryId: newFileInfo.Id})
+	err = s.TextManager.UpdateText(ctx, userId, dto.Text{Id: uint(req.Id), Description: req.Description, IsFile: true, BinaryId: newFileInfo.Id})
 	if err != nil {
-		err = s.binaryManager.DeleteBinaryFile(ctx, userId, newFileInfo.Id)
+		err = s.BinaryManager.DeleteBinaryFile(ctx, userId, newFileInfo.Id)
 		return err
 	}
 
@@ -149,13 +149,13 @@ func (s Server) UploadTextFile(stream grpc.ClientStreamingServer[pb.UploadTextFi
 		}
 	}()
 
-	newFileInfo, err := s.binaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
+	newFileInfo, err := s.BinaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
 	if err != nil {
 		return err
 	}
-	err = s.textManager.UploadText(ctx, dto.Text{UserId: userId, IsFile: true, Description: req.Description, BinaryId: newFileInfo.Id})
+	err = s.TextManager.UploadText(ctx, dto.Text{UserId: userId, IsFile: true, Description: req.Description, BinaryId: newFileInfo.Id})
 	if err != nil {
-		err = s.binaryManager.DeleteBinaryFile(ctx, userId, newFileInfo.Id)
+		err = s.BinaryManager.DeleteBinaryFile(ctx, userId, newFileInfo.Id)
 		if err != nil {
 			return err
 		}

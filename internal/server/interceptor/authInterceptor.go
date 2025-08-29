@@ -43,7 +43,7 @@ func (a *authInterceptor) UnaryAuthInterceptor(ctx context.Context, req interfac
 		}
 		userId, err := a.identityProvider.ParseToken(token)
 		if err != nil {
-			return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+			return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 		}
 
 		md = metadata.New(map[string]string{"user_id": strconv.Itoa(userId)})
@@ -68,7 +68,7 @@ func (a *authInterceptor) StreamingAuthInterceptor(srv any, ss grpc.ServerStream
 		}
 		userId, err := a.identityProvider.ParseToken(token)
 		if err != nil {
-			return status.Errorf(codes.Unauthenticated, "Unauthenticated")
+			return status.Errorf(codes.Unauthenticated, "unauthenticated")
 		}
 
 		md = metadata.New(map[string]string{"user_id": strconv.Itoa(userId)})

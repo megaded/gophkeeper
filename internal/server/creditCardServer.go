@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/dto"
 	pb "gophkeeper/proto"
 )
 
@@ -13,7 +13,7 @@ func (s *Server) GetCreditCardList(ctx context.Context, req *pb.CreditCardReques
 	if err != nil {
 		return nil, err
 	}
-	cards, err := s.creditCardManager.GetCreditCards(ctx, userId)
+	cards, err := s.CreditCardManager.GetCreditCards(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (s *Server) DeleteCreditCard(ctx context.Context, req *pb.DeleteCreditCardR
 	if err != nil {
 		return nil, err
 	}
-	err = s.creditCardManager.DeleteCreditCard(ctx, userId, uint(req.Id))
+	err = s.CreditCardManager.DeleteCreditCard(ctx, userId, uint(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (s *Server) AddCreditCard(ctx context.Context, req *pb.AddCreditCardRequest
 	if err != nil {
 		return nil, err
 	}
-	err = s.creditCardManager.AddCreditCard(ctx, userId, dto.Card{Number: req.Number, CVE: req.Cvv, Exp: req.Exp, Description: req.Description})
+	err = s.CreditCardManager.AddCreditCard(ctx, userId, dto.Card{Number: req.Number, CVE: req.Cvv, Exp: req.Exp, Description: req.Description})
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s Server) UpdateCreditCard(ctx context.Context, req *pb.UpdateCreditCardRe
 	if err != nil {
 		return nil, err
 	}
-	err = s.creditCardManager.UpdateCreditCard(ctx, userId, dto.Card{Id: uint(req.Card.Id), Number: req.Card.Number, Exp: req.Card.Exp, CVE: req.Card.Cvv, Description: req.Card.Description})
+	err = s.CreditCardManager.UpdateCreditCard(ctx, userId, dto.Card{Id: uint(req.Card.Id), Number: req.Card.Number, Exp: req.Card.Exp, CVE: req.Card.Cvv, Description: req.Card.Description})
 	if err != nil {
 		return nil, err
 	}

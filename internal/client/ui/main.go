@@ -3,7 +3,7 @@ package ui
 import (
 	"context"
 	"gophkeeper/internal/client/proto"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/dto"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

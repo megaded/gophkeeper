@@ -38,7 +38,7 @@ func (s PgStorage) AddUser(ctx context.Context, login string, password string) e
 }
 
 // Получение информации о пользователи по логину
-func (s *PgStorage) GetUser(ctx context.Context, login string) (model.User, error) {
+func (s PgStorage) GetUser(ctx context.Context, login string) (model.User, error) {
 	var user model.User
 	result := s.db.WithContext(ctx).Where("name = ?", login).First(&user)
 	switch {

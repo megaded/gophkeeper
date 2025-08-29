@@ -2,7 +2,6 @@ package postgre
 
 import (
 	"gophkeeper/internal/config"
-	"gophkeeper/internal/logger"
 	"gophkeeper/internal/storage/model"
 
 	"gorm.io/driver/postgres"
@@ -14,10 +13,10 @@ type PgStorage struct {
 }
 
 // Создание новое хранилище PosgreSql
-func NewStorage(c *config.Config) PgStorage {
+func NewStorage(c *config.Config) (PgStorage, error) {
 	db, err := gorm.Open(postgres.Open(c.DBConnString), &gorm.Config{})
 	if err != nil {
-		logger.Log.Fatal(err.Error())
+		return PgStorage{}, err
 	}
 
 	db.AutoMigrate(&model.User{})
@@ -25,5 +24,5 @@ func NewStorage(c *config.Config) PgStorage {
 	db.AutoMigrate(&model.CreditCard{})
 	db.AutoMigrate(&model.Binary{})
 	db.AutoMigrate(&model.Text{})
-	return PgStorage{db: db}
+	return PgStorage{db: db}, nil
 }

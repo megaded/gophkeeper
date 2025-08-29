@@ -4,10 +4,15 @@ import (
 	"bufio"
 	"context"
 	fileutil "gophkeeper/internal/client/proto/fileUtil"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/dto"
 	pb "gophkeeper/proto"
 	"io"
 	"os"
+)
+
+const (
+	defaultBufferSize = 32 * 1024   // 32KB
+	maxBufferSize     = 1024 * 1024 // 1MB
 )
 
 func (c *keeperClient) UploadBinaryFile(ctx context.Context, filePath string, description string) error {
@@ -135,7 +140,11 @@ func (c keeperClient) UpdateBinaryFile(ctx context.Context, filePath string, des
 	}
 
 	buf := bufio.NewReader(file)
-	data := make([]byte, buf.Size())
+	bufferSize := defaultBufferSize
+	if fStat.Size() > int64(maxBufferSize) {
+		bufferSize = maxBufferSize
+	}
+	data := make([]byte, bufferSize)
 	var totalSize int64 = 0
 	for err != io.EOF {
 		b, err := buf.Read(data)

@@ -4,9 +4,13 @@ import (
 	"context"
 	"gophkeeper/internal/config"
 	"gophkeeper/internal/identity"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/manager"
+
+	"gophkeeper/internal/dto"
 	"gophkeeper/internal/server/interceptor"
+	"gophkeeper/internal/storage/fileStorage/minio"
 	"gophkeeper/internal/storage/model"
+	"gophkeeper/internal/storage/postgre"
 	pb "gophkeeper/proto"
 	"io"
 	"net"
@@ -15,14 +19,14 @@ import (
 )
 
 type Server struct {
-	storage           storager
-	cfg               config.Config
-	userManager       userManager
-	identityProvider  identity.IdentityProvider
-	binaryManager     binaryManager
-	creditCardManager creditCardManager
-	credManager       credentialsManager
-	textManager       textManager
+	Storage           Storager
+	Cfg               config.Config
+	UserManager       UserManager
+	IdentityProvider  identity.IdentityProvider
+	BinaryManager     BinaryManager
+	CreditCardManager CreditCardManager
+	CredManager       CredentialsManager
+	TextManager       TextManager
 	pb.UnimplementedKeeperServer
 }
 
@@ -31,11 +35,11 @@ type FileStorager interface {
 }
 
 func (s *Server) Start(ctx context.Context) {
-	listen, err := net.Listen("tcp", s.cfg.Address)
+	listen, err := net.Listen("tcp", s.Cfg.Address)
 	if err != nil {
 		panic(err)
 	}
-	authInterceptor := interceptor.GetAuthInterceptor(s.identityProvider)
+	authInterceptor := interceptor.GetAuthInterceptor(s.IdentityProvider)
 	server := grpc.NewServer(grpc.UnaryInterceptor(authInterceptor.UnaryAuthInterceptor), grpc.StreamInterceptor(authInterceptor.StreamingAuthInterceptor))
 
 	go func() {
@@ -50,21 +54,34 @@ func (s *Server) Start(ctx context.Context) {
 
 var _ pb.KeeperServer = (*Server)(nil)
 
-func NewServer(cfg config.Config, storage storager, userManager userManager,
-	identityProvider identity.IdentityProvider, binaryManager binaryManager,
-	creditCardManager creditCardManager, credManager credentialsManager,
-	textManager textManager) Server {
-	return Server{storage: storage,
-		cfg:               cfg,
-		userManager:       userManager,
-		identityProvider:  identityProvider,
-		binaryManager:     binaryManager,
-		creditCardManager: creditCardManager,
-		credManager:       credManager,
-		textManager:       textManager}
+func NewServer() (Server, error) {
+	cfg := config.GetConfig()
+	minio, err := minio.NewStorage(cfg)
+	if err != nil {
+		return Server{}, err
+	}
+	storage, err := postgre.NewStorage(&cfg)
+	if err != nil {
+		return Server{}, err
+	}
+	builder := NewBuilderServer()
+	binaryManager := manager.NewBinaryManager(minio, storage)
+	identity := identity.CreateIdentityProvider(&cfg)
+	crypto := manager.NewCryptoManager(cfg)
+	credManager := manager.NewCredentialsManager(&crypto, storage)
+	creditCard := manager.NewCreditCardManager(cfg, storage)
+	textManager := manager.NewTextManager(storage)
+	builder.SetConfig(cfg)
+	builder.SetStorage(storage)
+	builder.SetBinaryManager(binaryManager)
+	builder.SetIdentityProvider(identity)
+	builder.SetCredentialsManager(credManager)
+	builder.SetCreditCardManager(creditCard)
+	builder.SetTextManager(textManager)
+	return builder.Build(), nil
 }
 
-type storager interface {
+type Storager interface {
 	userStorager
 	credentialsStorager
 	creditCardStorager
@@ -97,11 +114,11 @@ type creditCardStorager interface {
 	UpdateCreditCard(ctx context.Context, id uint, cvv []byte, exp []byte, cve []byte, description string) error
 }
 
-type userManager interface {
+type UserManager interface {
 	CreateUser(ctx context.Context, login string, password string) error
 }
 
-type binaryManager interface {
+type BinaryManager interface {
 	UploadFile(ctx context.Context, userId uint, dto dto.BinaryFile, reader io.Reader) (dto.BinaryFile, error)
 	DownloadFile(ctx context.Context, userId uint, id uint) (reader io.Reader, info dto.BinaryFile, err error)
 	GetBinaryFiles(ctx context.Context, userId uint) ([]dto.BinaryFile, error)
@@ -109,20 +126,20 @@ type binaryManager interface {
 	DeleteBinaryFile(ctx context.Context, userId uint, id uint) error
 }
 
-type creditCardManager interface {
+type CreditCardManager interface {
 	UpdateCreditCard(ctx context.Context, userId uint, dto dto.Card) error
 	GetCreditCards(ctx context.Context, userId uint) ([]dto.Card, error)
 	AddCreditCard(ctx context.Context, userId uint, dto dto.Card) error
 	DeleteCreditCard(ctx context.Context, userId uint, id uint) error
 }
 
-type credentialsManager interface {
+type CredentialsManager interface {
 	AddCredentials(ctx context.Context, userId uint, cred dto.Credentials) error
 	GetCredentials(ctx context.Context, userId uint) ([]dto.Credentials, error)
 	DeleteCredential(ctx context.Context, userId uint, id uint) error
 	UpdateCredentials(ctx context.Context, userId uint, dto dto.Credentials) error
 }
-type textManager interface {
+type TextManager interface {
 	UploadText(ctx context.Context, dto dto.Text) error
 	GetTextList(ctx context.Context, userId uint) ([]dto.Text, error)
 	GetTextInfo(ctx context.Context, id uint) (dto.Text, error)

@@ -3,8 +3,8 @@ package manager
 
 import (
 	"context"
+	"gophkeeper/internal/dto"
 	"gophkeeper/internal/internal_error"
-	"gophkeeper/internal/server/dto"
 	"gophkeeper/internal/storage/model"
 	"io"
 	"os"

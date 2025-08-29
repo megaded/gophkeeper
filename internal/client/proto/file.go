@@ -2,7 +2,7 @@ package proto
 
 import (
 	"context"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/dto"
 	pb "gophkeeper/proto"
 )
 

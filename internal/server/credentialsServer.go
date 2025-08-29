@@ -3,7 +3,7 @@ package server
 
 import (
 	"context"
-	"gophkeeper/internal/server/dto"
+	"gophkeeper/internal/dto"
 	pb "gophkeeper/proto"
 )
 
@@ -13,7 +13,7 @@ func (s *Server) AddCredentials(ctx context.Context, req *pb.AddCredentialsReque
 	if err != nil {
 		return nil, err
 	}
-	err = s.credManager.AddCredentials(ctx, userId, dto.Credentials{Login: req.Login, Password: req.Password, Description: req.Description})
+	err = s.CredManager.AddCredentials(ctx, userId, dto.Credentials{Login: req.Login, Password: req.Password, Description: req.Description})
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (s *Server) GetCredentialsList(ctx context.Context, req *pb.CredentialListR
 	if err != nil {
 		return nil, err
 	}
-	r, err := s.credManager.GetCredentials(ctx, userId)
+	r, err := s.CredManager.GetCredentials(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (s *Server) DeleteCredential(ctx context.Context, req *pb.DeleteCredentialR
 	if err != nil {
 		return nil, err
 	}
-	err = s.credManager.DeleteCredential(ctx, userId, uint(req.Id))
+	err = s.CredManager.DeleteCredential(ctx, userId, uint(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (s Server) UpdateCredentials(ctx context.Context, req *pb.UpdateCredentials
 	if err != nil {
 		return nil, err
 	}
-	err = s.credManager.UpdateCredentials(ctx, userId, dto.Credentials{Id: uint(req.Credentials.Id), Login: req.Credentials.Login, Password: req.Credentials.Password, Description: req.Credentials.Description})
+	err = s.CredManager.UpdateCredentials(ctx, userId, dto.Credentials{Id: uint(req.Credentials.Id), Login: req.Credentials.Login, Password: req.Credentials.Password, Description: req.Credentials.Description})
 	if err != nil {
 		return nil, err
 	}

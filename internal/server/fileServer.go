@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
+	"gophkeeper/internal/dto"
 	"gophkeeper/internal/logger"
-	"gophkeeper/internal/server/dto"
 	pb "gophkeeper/proto"
 	"io"
 
@@ -46,7 +46,7 @@ func (s *Server) UploadBinaryFile(stream grpc.ClientStreamingServer[pb.UploadBin
 		}
 	}()
 
-	_, err = s.binaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
+	_, err = s.BinaryManager.UploadFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description}, rd)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (s *Server) DownloadBinaryFile(req *pb.DownloadBinaryFileRequest, resp grpc
 	if err != nil {
 		return err
 	}
-	reader, meta, err := s.binaryManager.DownloadFile(ctx, userId, uint(req.Id))
+	reader, meta, err := s.BinaryManager.DownloadFile(ctx, userId, uint(req.Id))
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (s *Server) GetBinaryFileList(ctx context.Context, request *pb.BinaryFileLi
 	if err != nil {
 		return nil, err
 	}
-	r, err := s.binaryManager.GetBinaryFiles(ctx, userId)
+	r, err := s.BinaryManager.GetBinaryFiles(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (s Server) DeleteBinaryFile(ctx context.Context, req *pb.DeleteBinaryFileRe
 	if err != nil {
 		return nil, err
 	}
-	err = s.binaryManager.DeleteBinaryFile(ctx, userId, uint(req.Id))
+	err = s.BinaryManager.DeleteBinaryFile(ctx, userId, uint(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (s Server) UpdateBinaryFile(stream grpc.ClientStreamingServer[pb.UpdateBina
 		}
 	}()
 
-	err = s.binaryManager.UpdateBinaryFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description, Id: uint(req.Id)}, rd)
+	err = s.BinaryManager.UpdateBinaryFile(context.Background(), userId, dto.BinaryFile{FileName: req.Filename, Description: req.Description, Id: uint(req.Id)}, rd)
 	if err != nil {
 		return err
 	}
